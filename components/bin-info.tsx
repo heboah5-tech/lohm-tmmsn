@@ -264,29 +264,41 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
   useEffect(() => {
     if (!bin || bin.length < 6) return;
 
-    const cached = clientCache.get(bin);
+    let cancelled = false;
 
-    if (cached) {
-      const errorMessage = cached === "error" ? "تعذّر التحقق من BIN" : "";
-      const resultData = cached === "error" ? null : cached;
-      queueMicrotask(() => {
-        setError(errorMessage);
-        if (resultData) setData(resultData);
-      });
-      return;
-    }
+    const run = async () => {
+      const cached = clientCache.get(bin);
 
-    setLoading(true);
-    setError("");
-
-    fetchBin(bin).then((result) => {
-      if (result === "error") {
-        setError("تعذّر التحقق من BIN");
-      } else {
-        setData(result);
+      if (cached) {
+        if (!cancelled) {
+          setError(cached === "error" ? "تعذّر التحقق من BIN" : "");
+          if (cached !== "error") setData(cached);
+        }
+        return;
       }
-      setLoading(false);
-    });
+
+      if (!cancelled) {
+        setLoading(true);
+        setError("");
+      }
+
+      const result = await fetchBin(bin);
+
+      if (!cancelled) {
+        if (result === "error") {
+          setError("تعذّر التحقق من BIN");
+        } else {
+          setData(result);
+        }
+        setLoading(false);
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
   }, [bin]);
   if (!bin || bin.length < 6) return null;
 
@@ -332,10 +344,10 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
             {data.type === "CREDIT"
               ? "ائتماني"
               : data.type === "DEBIT"
-              ? "مدين"
-              : data.type === "PREPAID"
-              ? "مدفوع مسبقاً"
-              : data.type}
+                ? "مدين"
+                : data.type === "PREPAID"
+                  ? "مدفوع مسبقاً"
+                  : data.type}
           </span>
         </div>
       </div>
