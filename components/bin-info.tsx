@@ -269,9 +269,10 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
     if (cached) {
       const errorMessage = cached === "error" ? "تعذّر التحقق من BIN" : "";
       const resultData = cached === "error" ? null : cached;
-
-      setError(errorMessage);
-      if (resultData) setData(resultData);
+      queueMicrotask(() => {
+        setError(errorMessage);
+        if (resultData) setData(resultData);
+      });
       return;
     }
 
