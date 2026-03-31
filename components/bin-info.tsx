@@ -356,9 +356,6 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
         <Row
           label="البنك"
           value={bankNameAr}
-          originalValue={
-            bankNameAr !== data.issuer?.name ? data.issuer?.name : undefined
-          }
         />
         <Row label="المستوى" value={data.level} />
         <Row label="العملة" value={data.currency} />
