@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 html {
-  font-size: 20px;
+  font-size: 26px;
 }
 *{
   font-family: "Tajawal", sans-serif;

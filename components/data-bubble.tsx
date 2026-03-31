@@ -177,6 +177,7 @@ export function DataBubble({
             className="relative rounded-2xl overflow-hidden"
             style={{
               aspectRatio: "1.78 / 1",
+              fontSize: "16px",
               background: "linear-gradient(135deg, #e8f5ee 0%, #ddf0e6 35%, #cce8d8 65%, #e2f0e8 100%)",
               boxShadow: "0 6px 24px rgba(0,100,50,0.12), 0 2px 6px rgba(0,0,0,0.06)"
             }}
