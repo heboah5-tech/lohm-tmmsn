@@ -110,7 +110,7 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards }: Dashb
 
       {/* Analytics Stats Bar */}
       <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 px-3 sm:px-4 md:px-6 py-2">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 md:gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5 md:gap-3">
           {/* Active Users */}
           <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-green-200">
             <div className="flex items-center gap-1.5">

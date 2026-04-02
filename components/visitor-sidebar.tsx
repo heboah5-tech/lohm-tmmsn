@@ -206,14 +206,14 @@ export function VisitorSidebar({
 
   return (
     <div
-      className="h-full w-full bg-white/95 backdrop-blur-sm landscape:border-l md:w-[400px] md:border-l border-gray-200 flex flex-col relative group shadow-sm"
+      className="h-full w-full bg-white/95 backdrop-blur-sm landscape:border-l md:w-[280px] lg:w-[360px] xl:w-[420px] md:border-l border-gray-200 flex flex-col relative group shadow-sm"
       style={{
         fontFamily: "Cairo, Tajawal, sans-serif",
         width: isLandscape ? `${sidebarWidth}px` : undefined,
       }}
     >
       {/* Header */}
-      <div className="p-3 sm:p-4 landscape:p-2 border-b border-gray-200 bg-gradient-to-b from-white to-gray-50">
+      <div className="p-3 landscape:p-2 border-b border-gray-200 bg-gradient-to-b from-white to-gray-50">
         <h1 className="text-xl landscape:text-base font-bold text-gray-800 mb-4 landscape:mb-2">
           لوحة التحكم
         </h1>
