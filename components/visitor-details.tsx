@@ -30,6 +30,7 @@ interface VisitorDetailsProps {
 
 export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   const [isNavigating, setIsNavigating] = useState(false);
+  const [navSelectValue, setNavSelectValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [nafadCode, setNafadCode] = useState("");
   const [cardsLayout, setCardsLayout] = useState<"vertical" | "horizontal">(
@@ -974,7 +975,13 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             </button>
             {/* Navigation Dropdown */}
             <select
-              onChange={(e) => handleNavigate(e.target.value)}
+              value={navSelectValue}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val) return;
+                setNavSelectValue(val);
+                void handleNavigate(val).finally(() => setNavSelectValue(""));
+              }}
               disabled={isNavigating}
               className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 sm:w-auto"
             >
