@@ -255,6 +255,37 @@ async function fetchBin(bin: string): Promise<BinData | "error"> {
   return result;
 }
 
+export function useBinData(cardNumber: string) {
+  const [data, setData] = useState<BinData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const bin = cardNumber?.replace(/\D/g, "").slice(0, 6);
+
+  useEffect(() => {
+    if (!bin || bin.length < 6) return;
+    let cancelled = false;
+    const run = async () => {
+      const cached = clientCache.get(bin);
+      if (cached) {
+        if (!cancelled && cached !== "error") setData(cached);
+        return;
+      }
+      if (!cancelled) setLoading(true);
+      const result = await fetchBin(bin);
+      if (!cancelled) {
+        if (result !== "error") setData(result);
+        setLoading(false);
+      }
+    };
+    void run();
+    return () => { cancelled = true; };
+  }, [bin]);
+
+  const bankNameAr = data ? translateBankName(data.issuer?.name) : null;
+  const countryAr = data ? translateCountry(data.country?.country) : null;
+
+  return { data, loading, bankNameAr, countryAr };
+}
+
 export function BinInfo({ cardNumber }: BinInfoProps) {
   const [data, setData] = useState<BinData | null>(null);
   const [loading, setLoading] = useState(false);

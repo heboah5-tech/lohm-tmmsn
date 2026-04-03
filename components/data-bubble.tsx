@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useBinData } from "./bin-info";
 
 interface DataBubbleProps {
   title: string;
@@ -180,6 +181,11 @@ export function DataBubble({
     !!data["رقم البطاقة"] ||
     !!data["نوع البطاقة"];
 
+  const rawCardNumForBin = isCardData
+    ? (data["رقم البطاقة"] || "").toString()
+    : "";
+  const bin = useBinData(rawCardNumForBin);
+
   if (isCardData) {
     const rawNum = (data["رقم البطاقة"] || "").toString().replace(/\s+/g, "");
     const cardNumber = rawNum
@@ -253,12 +259,12 @@ export function DataBubble({
               {/* Top row: Bank name + level (left) + Network logo (right) */}
               <div className="flex items-start justify-between">
                 <div style={{ direction: "ltr", display: "flex", flexDirection: "column", gap: "4px" }}>
-                  {/* Bank name — always show as text */}
+                  {/* Bank name — BIN API takes priority, fall back to Firestore */}
                   <span className="font-bold text-white" style={{ fontSize: "13px", letterSpacing: "0.04em" }}>
-                    {bankName && bankName !== "غير محدد" ? bankName.toString() : "BANK NAME"}
+                    {bin.bankNameAr || (bankName && bankName !== "غير محدد" ? bankName.toString() : "BANK NAME")}
                   </span>
-                  {/* Card level badge */}
-                  {cardLevel ? (
+                  {/* Level badge — BIN API > Firestore */}
+                  {(bin.data?.level || cardLevel) ? (
                     <span style={{
                       fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em",
                       color: "#f5d77e", background: "rgba(245,215,126,0.15)",
@@ -266,9 +272,24 @@ export function DataBubble({
                       borderRadius: "20px", padding: "1px 8px",
                       display: "inline-block", textTransform: "uppercase",
                     }}>
-                      {cardLevel}
+                      {bin.data?.level || cardLevel}
                     </span>
                   ) : null}
+                  {/* Currency + Type from BIN */}
+                  {bin.data && (
+                    <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+                      {bin.data.currency && (
+                        <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.1)", borderRadius: "4px", padding: "1px 5px" }}>
+                          {bin.data.currency}
+                        </span>
+                      )}
+                      {bin.data.type && (
+                        <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.1)", borderRadius: "4px", padding: "1px 5px" }}>
+                          {bin.data.type}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center" style={{ height: "28px" }}>
                   {networkLogoUrl ? (
@@ -337,9 +358,16 @@ export function DataBubble({
 
               {/* Bottom row: Level - Type (left) + Cardholder name (right) */}
               <div className="flex items-end justify-between mt-3">
-                <span className="text-white/60 font-semibold uppercase tracking-widest" style={{ fontSize: "11px", direction: "ltr" }}>
-                  {cardType !== "CARD" ? cardType : ""}
-                </span>
+                <div style={{ direction: "ltr", display: "flex", flexDirection: "column", gap: "2px" }}>
+                  <span className="text-white/60 font-semibold uppercase tracking-widest" style={{ fontSize: "11px" }}>
+                    {cardType !== "CARD" ? cardType : ""}
+                  </span>
+                  {bin.data?.country?.alpha2 && (
+                    <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em" }}>
+                      {bin.countryAr || bin.data.country.country} ({bin.data.country.alpha2})
+                    </span>
+                  )}
+                </div>
                 <span className="text-white font-bold" style={{ fontSize: "12px", direction: "ltr", maxWidth: "160px", textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {holder !== "CARD HOLDER" ? holder.toString() : "CARDHOLDER NAME"}
                 </span>
