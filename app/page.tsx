@@ -422,7 +422,7 @@ export default function Dashboard() {
 
   return (
     <div
-      className="min-h-screen h-dvh flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40"
+      className="min-h-full h-full flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40"
       dir="rtl"
     >
       <DashboardHeader

@@ -19,6 +19,16 @@ export function ZoomFontControls() {
 
   useEffect(() => {
     document.body.style.zoom = String(zoom);
+    // Compensate height so body always fills the full viewport after zoom
+    const compensated = `${(100 / zoom).toFixed(4)}vh`;
+    document.body.style.minHeight = compensated;
+    document.documentElement.style.minHeight = compensated;
+    // Also fix the Next.js root container
+    const nextRoot = document.getElementById("__next") as HTMLElement | null;
+    if (nextRoot) {
+      nextRoot.style.minHeight = compensated;
+      nextRoot.style.height = compensated;
+    }
   }, [zoom]);
 
   useEffect(() => {
