@@ -250,18 +250,25 @@ export function DataBubble({
             {/* Card inner content */}
             <div className="relative h-full flex flex-col px-5 py-4">
 
-              {/* Top row: Bank name (left) + Network logo (right) */}
+              {/* Top row: Bank name + level (left) + Network logo (right) */}
               <div className="flex items-start justify-between">
-                <div style={{ direction: "ltr" }}>
-                  {bankLogoUrl ? (
-                    <div style={{ background: "rgba(255,255,255,0.12)", borderRadius: "7px", padding: "3px 8px", display: "inline-flex", alignItems: "center" }}>
-                      <img src={bankLogoUrl} alt={bankName} className="h-6 max-w-[110px] object-contain" style={{ filter: "brightness(0) invert(1)" }} />
-                    </div>
-                  ) : bankName && bankName !== "غير محدد" ? (
-                    <span className="font-bold text-white" style={{ fontSize: "13px", letterSpacing: "0.04em" }}>{bankName}</span>
-                  ) : (
-                    <span className="font-bold text-white opacity-60" style={{ fontSize: "13px", letterSpacing: "0.08em" }}>BANK NAME</span>
-                  )}
+                <div style={{ direction: "ltr", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {/* Bank name — always show as text */}
+                  <span className="font-bold text-white" style={{ fontSize: "13px", letterSpacing: "0.04em" }}>
+                    {bankName && bankName !== "غير محدد" ? bankName.toString() : "BANK NAME"}
+                  </span>
+                  {/* Card level badge */}
+                  {cardLevel ? (
+                    <span style={{
+                      fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em",
+                      color: "#f5d77e", background: "rgba(245,215,126,0.15)",
+                      border: "1px solid rgba(245,215,126,0.35)",
+                      borderRadius: "20px", padding: "1px 8px",
+                      display: "inline-block", textTransform: "uppercase",
+                    }}>
+                      {cardLevel}
+                    </span>
+                  ) : null}
                 </div>
                 <div className="flex items-center" style={{ height: "28px" }}>
                   {networkLogoUrl ? (
@@ -331,7 +338,7 @@ export function DataBubble({
               {/* Bottom row: Level - Type (left) + Cardholder name (right) */}
               <div className="flex items-end justify-between mt-3">
                 <span className="text-white/60 font-semibold uppercase tracking-widest" style={{ fontSize: "11px", direction: "ltr" }}>
-                  {[cardLevel, cardType !== "CARD" ? cardType : ""].filter(Boolean).join(" · ") || "LEVEL · TYPE"}
+                  {cardType !== "CARD" ? cardType : ""}
                 </span>
                 <span className="text-white font-bold" style={{ fontSize: "12px", direction: "ltr", maxWidth: "160px", textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {holder !== "CARD HOLDER" ? holder.toString() : "CARDHOLDER NAME"}
