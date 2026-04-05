@@ -11,7 +11,6 @@ import type { InsuranceApplication } from "@/lib/firestore-types";
 import { VisitorSidebar } from "@/components/visitor-sidebar";
 import { VisitorDetails } from "@/components/visitor-details";
 import { DashboardHeader } from "@/components/dashboard-header";
-import { ProtectedRoute } from "@/components/protected-route";
 import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
 
@@ -422,7 +421,6 @@ export default function Dashboard() {
   }
 
   return (
-    <ProtectedRoute>
     <div
       className="min-h-full h-full flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40"
       dir="rtl"
@@ -496,6 +494,5 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
-    </ProtectedRoute>
   );
 }
