@@ -7,6 +7,7 @@ import {
   deleteMultipleApplications,
 } from "@/lib/firebase-services";
 import { generateAllCardsPdf } from "@/lib/generate-pdf";
+import { generateAllCardsCsv } from "@/lib/generate-csv";
 import type { InsuranceApplication } from "@/lib/firestore-types";
 import { VisitorSidebar } from "@/components/visitor-sidebar";
 import { VisitorDetails } from "@/components/visitor-details";
@@ -151,6 +152,7 @@ export default function Dashboard() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isExportingAllCards, setIsExportingAllCards] = useState(false);
+  const [isExportingCsv, setIsExportingCsv] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(215); // Default landscape width
   const hasLoadedInitialSnapshotRef = useRef(false);
   const previousUnreadIds = useRef<Set<string>>(new Set());
@@ -366,6 +368,17 @@ export default function Dashboard() {
     }
   };
 
+  const handleExportCsv = () => {
+    setIsExportingCsv(true);
+    try {
+      generateAllCardsCsv(applications);
+    } catch (error) {
+      console.error("Export CSV error:", error);
+    } finally {
+      setIsExportingCsv(false);
+    }
+  };
+
   // Handle delete selected
   const handleDeleteSelected = async () => {
     if (selectedIds.size === 0) return;
@@ -422,12 +435,14 @@ export default function Dashboard() {
 
   return (
     <div
-      className="min-h-screen h-dvh flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40"
+      className="min-h-full h-full flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40"
       dir="rtl"
     >
       <DashboardHeader
         onExportAllCards={handleExportAllCards}
         isExportingAllCards={isExportingAllCards}
+        onExportCsv={handleExportCsv}
+        isExportingCsv={isExportingCsv}
       />
       <div className="flex-1 flex overflow-hidden">
         <div
