@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useBinData } from "./bin-info";
 
 interface DataBubbleProps {
   title: string;
@@ -180,6 +181,11 @@ export function DataBubble({
     !!data["رقم البطاقة"] ||
     !!data["نوع البطاقة"];
 
+  const rawCardNumForBin = isCardData
+    ? (data["رقم البطاقة"] || "").toString()
+    : "";
+  const bin = useBinData(rawCardNumForBin);
+
   if (isCardData) {
     const rawNum = (data["رقم البطاقة"] || "").toString().replace(/\s+/g, "");
     const cardNumber = rawNum
@@ -235,200 +241,140 @@ export function DataBubble({
             style={{
               aspectRatio: "1.78 / 1",
               fontSize: "16px",
-              background:
-                "linear-gradient(135deg, #e8f5ee 0%, #ddf0e6 35%, #cce8d8 65%, #e2f0e8 100%)",
-              boxShadow:
-                "0 6px 24px rgba(0,100,50,0.12), 0 2px 6px rgba(0,0,0,0.06)",
+              background: "linear-gradient(160deg, #0a2a2e 0%, #0e3840 50%, #134e58 100%)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2)",
             }}
           >
-            {/* Sheen overlay */}
+            {/* Subtle sheen */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 55%)",
+                background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%)",
               }}
             />
 
             {/* Card inner content */}
             <div className="relative h-full flex flex-col px-5 py-4">
-              {/* Top row: Bank logo/name (left) + SAR badge (right) */}
+
+              {/* Top row: Bank name + level (left) + Network logo (right) */}
               <div className="flex items-start justify-between">
-                <div>
-                  {bankLogoUrl ? (
-                    <div
-                      style={{
-                        background: "#fff",
-                        borderRadius: "8px",
-                        padding: "3px 8px",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-                      }}
-                    >
-                      <img
-                        src={bankLogoUrl}
-                        alt={bankName}
-                        className="h-6 max-w-[110px] object-contain"
-                      />
-                    </div>
-                  ) : bankName && bankName !== "غير محدد" ? (
-                    <span
-                      className="font-extrabold text-green-900 leading-tight"
-                      style={{
-                        fontSize: "13px",
-                        direction: "ltr",
-                        maxWidth: "150px",
-                        display: "block",
-                      }}
-                    >
-                      {bankName}
+                <div style={{ direction: "ltr", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {/* Bank name — BIN API takes priority, fall back to Firestore */}
+                  <span className="font-bold text-white" style={{ fontSize: "13px", letterSpacing: "0.04em" }}>
+                    {bin.bankNameAr || (bankName && bankName !== "غير محدد" ? bankName.toString() : "BANK NAME")}
+                  </span>
+                  {/* Level badge — BIN API > Firestore */}
+                  {(bin.data?.level || cardLevel) ? (
+                    <span style={{
+                      fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em",
+                      color: "#f5d77e", background: "rgba(245,215,126,0.15)",
+                      border: "1px solid rgba(245,215,126,0.35)",
+                      borderRadius: "20px", padding: "1px 8px",
+                      display: "inline-block", textTransform: "uppercase",
+                    }}>
+                      {bin.data?.level || cardLevel}
                     </span>
                   ) : null}
+                  {/* Currency + Type from BIN */}
+                  {bin.data && (
+                    <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+                      {bin.data.currency && (
+                        <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.1)", borderRadius: "4px", padding: "1px 5px" }}>
+                          {bin.data.currency}
+                        </span>
+                      )}
+                      {bin.data.type && (
+                        <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.1)", borderRadius: "4px", padding: "1px 5px" }}>
+                          {bin.data.type}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div
-                  className="text-xs font-bold text-gray-700"
-                  style={{
-                    border: "1.5px solid #555",
-                    borderRadius: "7px",
-                    padding: "2px 10px",
-                    background: "rgba(255,255,255,0.55)",
-                  }}
-                >
-                  SAR
+                <div className="flex items-center" style={{ height: "28px" }}>
+                  {networkLogoUrl ? (
+                    <img src={networkLogoUrl} alt={brand} className="h-7 max-w-[72px] object-contain" style={{ filter: "brightness(0) invert(1)" }} />
+                  ) : brand !== "CARD" ? (
+                    <span className="font-black text-white uppercase" style={{ fontSize: "13px", letterSpacing: "0.06em" }}>{brand}</span>
+                  ) : null}
                 </div>
               </div>
 
-              {/* Card type + level */}
-              {(cardType !== "CARD" || cardLevel) && (
-                <div className="mt-1.5 flex items-center gap-1.5">
-                  {cardType !== "CARD" && (
-                    <span
-                      className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
-                      style={{
-                        background: "rgba(255,255,255,0.6)",
-                        color: "#2d5a3d",
-                        border: "1px solid rgba(0,100,50,0.2)",
-                      }}
-                    >
-                      {cardType}
-                    </span>
-                  )}
-                  {cardLevel && (
-                    <span
-                      className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
-                      style={{
-                        background: "rgba(255,255,255,0.6)",
-                        color: "#2d5a3d",
-                        border: "1px solid rgba(0,100,50,0.2)",
-                      }}
-                    >
-                      {cardLevel}
-                    </span>
-                  )}
+              {/* Middle row: Chip + Card Number */}
+              <div className="flex items-center gap-4 mt-auto">
+                {/* EMV Chip */}
+                <div style={{
+                  width: "38px", height: "28px", borderRadius: "5px", flexShrink: 0,
+                  background: "linear-gradient(135deg, #c9a227 0%, #f5d77e 40%, #c9a227 100%)",
+                  display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr",
+                  gap: "2px", padding: "4px", boxSizing: "border-box",
+                }}>
+                  {[0,1,2,3].map(i => (
+                    <div key={i} style={{ background: "rgba(120,80,0,0.35)", borderRadius: "2px" }} />
+                  ))}
                 </div>
-              )}
-
-              {/* Card Number */}
-              <div className="mt-auto">
+                {/* Card Number */}
                 <button
                   type="button"
                   onClick={() => void handleCopy("cardNumber", rawNum)}
                   disabled={!isCopyableValue(rawNum)}
                   title="نسخ رقم البطاقة"
-                  className="group text-left"
+                  className="group text-left flex-1"
                 >
-                  <div
-                    className="font-mono font-bold tracking-widest text-gray-900 text-2xl group-hover:opacity-70 transition-opacity"
-                    style={{ direction: "ltr" }}
-                  >
+                  <div className="font-mono font-bold text-white tracking-widest group-hover:opacity-70 transition-opacity" style={{ fontSize: "18px", direction: "ltr" }}>
                     {cardNumber}
                   </div>
-                  <div className="text-[9px] text-gray-500 mt-0.5 opacity-0 group-hover:opacity-70 transition-opacity">
+                  <div className="text-[9px] text-white/40 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     {copiedField === "cardNumber" ? "✓ تم النسخ" : "انقر للنسخ"}
                   </div>
                 </button>
               </div>
 
-              {/* Bottom row: Flag + Expiry + CVV + Network logo */}
-              <div className="flex items-end justify-between mt-2">
-                <div className="flex items-end gap-4">
-                  <span className="text-xl leading-none">🇸🇦</span>
-                  <button
-                    type="button"
-                    onClick={() => void handleCopy("expiryDate", rawExpiry)}
-                    disabled={!isCopyableValue(rawExpiry)}
-                    title="نسخ تاريخ الانتهاء"
-                    className="group text-left"
-                  >
-                    <div className="text-[10px] text-gray-500 mb-0.5 tracking-wide">
-                      EXP
-                    </div>
-                    <div
-                      className="font-mono font-bold text-gray-900 text-lg group-hover:opacity-70 transition-opacity"
-                      style={{ direction: "ltr" }}
-                    >
-                      {copiedField === "expiryDate" ? "✓" : expiry}
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void handleCopy("cvv", rawCvv)}
-                    disabled={!isCopyableValue(rawCvv)}
-                    title="نسخ CVV"
-                    className="group text-left"
-                  >
-                    <div className="text-[10px] text-gray-500 mb-0.5 tracking-wide">
-                      CVV
-                    </div>
-                    <div
-                      className="font-mono font-bold text-gray-900 text-lg group-hover:opacity-70 transition-opacity"
-                      style={{ direction: "ltr" }}
-                    >
-                      {copiedField === "cvv" ? "✓" : cvv}
-                    </div>
-                  </button>
-                </div>
-                <div className="flex items-center">
-                  {networkLogoUrl ? (
-                    <img
-                      src={networkLogoUrl}
-                      alt={brand}
-                      className="h-7 max-w-[72px] object-contain"
-                    />
-                  ) : brand !== "CARD" ? (
-                    <span className="text-xs font-black text-gray-700 uppercase">
-                      {brand}
+              {/* Expiry + CVV row */}
+              <div className="flex items-center gap-8 mt-2" style={{ direction: "ltr" }}>
+                <button
+                  type="button"
+                  onClick={() => void handleCopy("expiryDate", rawExpiry)}
+                  disabled={!isCopyableValue(rawExpiry)}
+                  title="نسخ تاريخ الانتهاء"
+                  className="group text-left"
+                >
+                  <div className="font-mono font-semibold text-white group-hover:opacity-70 transition-opacity" style={{ fontSize: "14px" }}>
+                    {copiedField === "expiryDate" ? "✓" : expiry}
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleCopy("cvv", rawCvv)}
+                  disabled={!isCopyableValue(rawCvv)}
+                  title="نسخ CVV"
+                  className="group text-left"
+                >
+                  <div className="font-mono font-semibold text-white group-hover:opacity-70 transition-opacity" style={{ fontSize: "14px" }}>
+                    {copiedField === "cvv" ? "✓" : cvv}
+                  </div>
+                </button>
+              </div>
+
+              {/* Bottom row: Level - Type (left) + Cardholder name (right) */}
+              <div className="flex items-end justify-between mt-3">
+                <div style={{ direction: "ltr", display: "flex", flexDirection: "column", gap: "2px" }}>
+                  <span className="text-white/60 font-semibold uppercase tracking-widest" style={{ fontSize: "11px" }}>
+                    {cardType !== "CARD" ? cardType : ""}
+                  </span>
+                  {bin.data?.country?.alpha2 && (
+                    <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em" }}>
+                      {bin.countryAr || bin.data.country.country} ({bin.data.country.alpha2})
                     </span>
-                  ) : null}
+                  )}
                 </div>
+                <span className="text-white font-bold" style={{ fontSize: "12px", direction: "ltr", maxWidth: "160px", textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {holder !== "CARD HOLDER" ? holder.toString() : "CARDHOLDER NAME"}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* ─── Tags below card ─── */}
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {bankName && bankName !== "غير محدد" && (
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                {bankName}
-              </span>
-            )}
-            {bankCountry && bankCountry !== "غير محدد" && (
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
-                {bankCountry}
-              </span>
-            )}
-            {cardType && cardType !== "CARD" && (
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
-                {cardType}
-              </span>
-            )}
-            {cardLevel && (
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
-                {cardLevel}
-              </span>
-            )}
-          </div>
         </div>
 
         {/* ─── Footer: status + actions ─── */}
