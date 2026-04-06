@@ -2,17 +2,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-html, body {
+html {
   font-size: 26px;
-  height: 100%;
-  min-height: 100vh;
 }
-
-* {
+*{
   font-family: "Tajawal", sans-serif;
 }
-
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -57,7 +52,6 @@ html, body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
-
   .dark {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
@@ -85,3 +79,4 @@ html, body {
     --chart-5: 340 75% 55%;
   }
 }
+

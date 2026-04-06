@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
-import { Settings, FileDown, FileSpreadsheet } from "lucide-react"
+import { Settings, FileDown } from "lucide-react"
 
 interface AnalyticsData {
   activeUsers: number
@@ -17,11 +17,9 @@ interface AnalyticsData {
 interface DashboardHeaderProps {
   onExportAllCards?: () => void
   isExportingAllCards?: boolean
-  onExportCsv?: () => void
-  isExportingCsv?: boolean
 }
 
-export function DashboardHeader({ onExportAllCards, isExportingAllCards, onExportCsv, isExportingCsv }: DashboardHeaderProps = {}) {
+export function DashboardHeader({ onExportAllCards, isExportingAllCards }: DashboardHeaderProps = {}) {
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     activeUsers: 0,
     todayVisitors: 0,
@@ -76,29 +74,6 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards, onExpor
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-3">
-            {onExportCsv && (
-              <button
-                onClick={onExportCsv}
-                disabled={isExportingCsv}
-                className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors whitespace-nowrap"
-                title="تصدير جميع البطاقات CSV"
-              >
-                {isExportingCsv ? (
-                  <>
-                    <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    جاري التصدير...
-                  </>
-                ) : (
-                  <>
-                    <FileSpreadsheet className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                    تصدير CSV
-                  </>
-                )}
-              </button>
-            )}
             {onExportAllCards && (
               <button
                 onClick={onExportAllCards}
