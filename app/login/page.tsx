@@ -128,21 +128,8 @@ export default function LoginPage() {
           }} />
 
           <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "14px" }}>
-            {/* Icon */}
-            <div style={{
-              width: "52px", height: "52px", borderRadius: "16px", flexShrink: 0,
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.18)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "24px",
-            }}>
-              🛡️
-            </div>
             <div>
-              <div style={{ color: "#fff", fontSize: "20px", fontWeight: 800, lineHeight: 1.2 }}>
-                BCare Dashboard
-              </div>
-              <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px", marginTop: "3px" }}>
+              <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "12px" }}>
                 نظام إدارة الزوار
               </div>
             </div>
