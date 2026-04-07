@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppToaster } from "@/components/app-toaster";
+import { ZoomFontControls } from "@/components/zoom-font-controls";
 
 export const metadata: Metadata = {
   title: "لوحة التحكم - BCare",
@@ -18,8 +19,9 @@ export default function RootLayout({
     <html lang="ar" dir="rtl">
     
       <body >
-        {children}
-        <AppToaster />
+          {children}
+          <AppToaster />
+          <ZoomFontControls />
       </body>
     </html>
   );
