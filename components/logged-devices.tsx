@@ -44,7 +44,7 @@ function formatRelative(ms: number) {
 export function LoggedDevices() {
   const { user } = useAuth();
   const [sessions, setSessions] = useState<AdminSession[]>([]);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
     const unsubscribe = subscribeToAdminSessions((all) => {
@@ -53,8 +53,9 @@ export function LoggedDevices() {
     return () => unsubscribe();
   }, []);
 
-  // Tick every 30s to refresh relative times
+  // Set initial value and tick every 30s to refresh relative times
   useEffect(() => {
+    setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(id);
   }, []);
