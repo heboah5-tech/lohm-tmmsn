@@ -66,7 +66,9 @@ export function mockupPreviewPlugin(): Plugin {
 
     return files.map((f) => ({
       globKey: "./" + f.slice("src/".length),
-      importPath: path.posix.relative("src/.generated", f),
+      importPath: path.posix
+        .relative("src/.generated", f)
+        .replace(/\.tsx?$/, ""),
     }));
   }
 
