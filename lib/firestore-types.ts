@@ -7,6 +7,7 @@ export interface InsuranceApplication {
     identityNumber: string
     ownerName: string
     phoneNumber: string
+    birthDate:string,
     documentType: "استمارة" | "بطاقة جمركية"
     serialNumber: string
     insuranceType: "تأمين جديد" | "نقل ملكية"

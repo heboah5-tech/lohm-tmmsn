@@ -173,6 +173,8 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   if (visitor.ownerName || visitor.identityNumber) {
     const basicData: Record<string, any> = {
       الاسم: visitor.ownerName,
+      "تاريخ الميلاد ": visitor.birthDate,
+      
       "رقم الهوية": visitor.identityNumber,
       "رقم الهاتف": visitor.phoneNumber,
       "نوع الوثيقة": visitor.documentType,

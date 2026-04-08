@@ -2,7 +2,6 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-
 const rawDbUrl = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL ?? "";
 
 // Only include databaseURL if it looks valid (must start with https:// and contain .firebaseio.com)
