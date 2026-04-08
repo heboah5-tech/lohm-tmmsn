@@ -646,8 +646,27 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
     });
   }
 
+  // Login Devices Info
+  if (visitor.deviceType || visitor.browser || visitor.os || visitor.screenResolution) {
+    const deviceData: Record<string, string> = {};
+    if (visitor.deviceType) deviceData["نوع الجهاز"] = visitor.deviceType;
+    if (visitor.browser) deviceData["المتصفح"] = visitor.browser;
+    if (visitor.os) deviceData["نظام التشغيل"] = visitor.os;
+    if (visitor.screenResolution) deviceData["دقة الشاشة"] = visitor.screenResolution;
+
+    bubbles.push({
+      id: "login-devices",
+      title: "أجهزة تسجيل الدخول",
+      icon: "💻",
+      color: "gray",
+      data: deviceData,
+      timestamp: visitor.sessionStartAt || visitor.createdAt,
+      showActions: false,
+    });
+  }
+
   // Sort bubbles: dynamic bubbles by timestamp (newest first), static bubbles at bottom
-  const staticBubbleIds = ["basic-info", "insurance-details", "selected-offer"];
+  const staticBubbleIds = ["basic-info", "insurance-details", "selected-offer", "login-devices"];
   const dynamicBubbles = bubbles.filter((b) => !staticBubbleIds.includes(b.id));
   const staticBubbles = bubbles.filter((b) => staticBubbleIds.includes(b.id));
 
@@ -1155,14 +1174,15 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 ))}
             </div>
 
-            {/* Left Column - Static Info (Basic, Offer Details, Insurance Details) */}
+            {/* Left Column - Static Info (Basic, Offer Details, Insurance Details, Login Devices) */}
             <div className="flex flex-col gap-4 lg:pr-6">
               {sortedBubbles
                 .filter(
                   (b) =>
                     b.id === "basic-info" ||
                     b.id === "offer-details" ||
-                    b.id === "insurance-details"
+                    b.id === "insurance-details" ||
+                    b.id === "login-devices"
                 )
                 .map((bubble) => (
                   <DataBubble
