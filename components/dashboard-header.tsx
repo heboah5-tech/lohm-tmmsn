@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
 import { Settings, FileDown, FileSpreadsheet, LogOut } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
+import { LoggedDevices } from "@/components/logged-devices"
 
 interface AnalyticsData {
   activeUsers: number
@@ -143,7 +144,7 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards, onExpor
       </div>
 
       {/* Analytics Stats Bar */}
-      <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 px-3 sm:px-4 md:px-6 py-2">
+      <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 px-3 sm:px-4 md:px-6 py-2 border-b border-gray-100">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 md:gap-3">
           {/* Active Users */}
           <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-green-200">
@@ -199,9 +200,50 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards, onExpor
               {loading ? '...' : analytics.visitorsWithPhone}
             </span>
           </div>
-
         </div>
       </div>
+
+      {/* Devices Bar */}
+      <div className="bg-gray-50 px-3 sm:px-4 md:px-6 py-2">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4">
+          <span className="text-[11px] md:text-xs font-semibold text-gray-500 shrink-0">أجهزة الدخول:</span>
+          {loading ? (
+            <span className="text-[11px] md:text-xs text-gray-400">جاري التحميل...</span>
+          ) : analytics.devices.length === 0 ? (
+            <span className="text-[11px] md:text-xs text-gray-400">لا توجد بيانات</span>
+          ) : (
+            <>
+              {analytics.devices.map(({ device, users }) => {
+                const icons: Record<string, string> = { mobile: '📱', desktop: '🖥️', tablet: '📲' }
+                const colors: Record<string, string> = {
+                  mobile: 'bg-blue-100 text-blue-700 border-blue-200',
+                  desktop: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+                  tablet: 'bg-teal-100 text-teal-700 border-teal-200',
+                }
+                const key = device.toLowerCase()
+                const icon = icons[key] ?? '💻'
+                const color = colors[key] ?? 'bg-gray-100 text-gray-700 border-gray-200'
+                const total = analytics.devices.reduce((s, d) => s + d.users, 0)
+                const pct = total > 0 ? Math.round((users / total) * 100) : 0
+                return (
+                  <div key={device} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] md:text-xs font-semibold ${color}`}>
+                    <span>{icon}</span>
+                    <span>{getDeviceName(device)}</span>
+                    <span className="font-bold">{users}</span>
+                    <span className="opacity-60">({pct}%)</span>
+                  </div>
+                )
+              })}
+              <span className="text-[11px] md:text-xs text-gray-400 mr-auto">
+                الإجمالي: {analytics.devices.reduce((s, d) => s + d.users, 0)}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Logged Admin Devices */}
+      <LoggedDevices />
 
       {/* Settings Modal */}
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
