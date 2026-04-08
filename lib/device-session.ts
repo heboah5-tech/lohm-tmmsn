@@ -73,6 +73,14 @@ export async function pingDeviceSession(uid: string) {
   }
 }
 
+export async function forceRemoveSession(docId: string) {
+  try {
+    await deleteDoc(doc(db, "admin_sessions", docId));
+  } catch {
+    // Silently fail
+  }
+}
+
 export async function removeDeviceSession(uid: string) {
   const sessionId = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(SESSION_KEY) : null;
   if (!sessionId) return;
