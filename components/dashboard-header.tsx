@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
-import { Settings, FileDown, FileSpreadsheet } from "lucide-react"
+import { Settings, FileDown, FileSpreadsheet, LogOut } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
 
 interface AnalyticsData {
   activeUsers: number
@@ -22,6 +23,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onExportAllCards, isExportingAllCards, onExportCsv, isExportingCsv }: DashboardHeaderProps = {}) {
+  const { logout } = useAuth()
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     activeUsers: 0,
     todayVisitors: 0,
@@ -128,6 +130,13 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards, onExpor
               title="إعدادات"
             >
               <Settings className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
+            <button
+              onClick={logout}
+              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
+              title="تسجيل الخروج"
+            >
+              <LogOut className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
         </div>
