@@ -1,40 +1,21 @@
 // firebase.ts
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
-const rawDbUrl = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL ?? "";
-
-// Only include databaseURL if it looks valid (must start with https:// and contain .firebaseio.com)
-const isValidDbUrl =
-  rawDbUrl.startsWith("https://") && rawDbUrl.includes(".firebaseio.com");
-
-const firebaseConfig: Record<string, string> = {
-  apiKey: "AIzaSyAoQLPeg1cEMiX7cqemczMYRuMJLEBud6Q",
-  authDomain: "artv-a004f.firebaseapp.com",
-  projectId: "artv-a004f",
-  storageBucket: "artv-a004f.firebasestorage.app",
-  messagingSenderId: "793533215100",
-  appId: "1:793533215100:web:1c131c488cc82787e5b4f9",
-  measurementId: "G-539BNZVSQK",
+const firebaseConfig = {
+ apiKey: "AIzaSyA76eNKpMAO1sGzK7HANK5-VRyASJIq8Rw",
+  authDomain: "fgfd-2b2c3.firebaseapp.com",
+  projectId: "fgfd-2b2c3",
+  storageBucket: "fgfd-2b2c3.firebasestorage.app",
+  messagingSenderId: "429384612235",
+  appId: "1:429384612235:web:253427804a116076b2178e",
+  measurementId: "G-2FXMPP0VCQ"
 };
-
-if (isValidDbUrl) {
-  firebaseConfig.databaseURL = rawDbUrl;
-}
 
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-// Only import and initialize Realtime DB if we have a valid URL
-let database: import("firebase/database").Database | null = null;
-
-if (isValidDbUrl && typeof window !== "undefined") {
-  import("firebase/database")
-    .then(({ getDatabase }) => {
-      database = getDatabase(app);
-    })
-    .catch(() => {});
-}
+const database = getDatabase(app);
 
 export { auth, db, database };

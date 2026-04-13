@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { User, onAuthStateChanged } from "firebase/auth"
 import { auth } from "./firebase"
 import { useRouter } from "next/navigation"
-import { recordDeviceSession, pingDeviceSession, removeDeviceSession } from "./device-session"
 
 interface AuthContextType {
   user: User | null
@@ -24,37 +23,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser)
       setLoading(false)
-
-      if (firebaseUser) {
-        // Record this device session when user logs in
-        try {
-          await recordDeviceSession(firebaseUser.uid, firebaseUser.email || "")
-        } catch {
-          // Silently fail if Firestore is unavailable
-        }
-      }
     })
 
     return () => unsubscribe()
   }, [])
 
-  // Ping activity every 2 minutes to show session is still active
-  useEffect(() => {
-    if (!user) return
-    const interval = setInterval(() => {
-      pingDeviceSession(user.uid).catch(() => {})
-    }, 2 * 60 * 1000)
-    return () => clearInterval(interval)
-  }, [user])
-
   const logout = async () => {
     try {
-      if (user) {
-        await removeDeviceSession(user.uid)
-      }
       await auth.signOut()
       router.push("/login")
     } catch (error) {

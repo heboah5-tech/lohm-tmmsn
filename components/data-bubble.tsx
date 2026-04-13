@@ -241,7 +241,7 @@ export function DataBubble({
             style={{
               aspectRatio: "1.78 / 1",
               fontSize: "16px",
-              background: "linear-gradient(160deg, #0a2a2e 0%, #0e3840 50%, #134e58 100%)",
+              background: "linear-gradient(160deg, #0d1b3e 0%, #162040 50%, #1a2a55 100%)",
               boxShadow: "0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2)",
             }}
           >
@@ -375,6 +375,29 @@ export function DataBubble({
             </div>
           </div>
 
+          {/* ─── Tags below card ─── */}
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {bankName && bankName !== "غير محدد" && (
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                {bankName}
+              </span>
+            )}
+            {bankCountry && bankCountry !== "غير محدد" && (
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                {bankCountry}
+              </span>
+            )}
+            {cardType && cardType !== "CARD" && (
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-200">
+                {cardType}
+              </span>
+            )}
+            {cardLevel && (
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
+                {cardLevel}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* ─── Footer: status + actions ─── */}
