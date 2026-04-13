@@ -54,7 +54,7 @@ export function VisitorBlockControl({ visitor }: VisitorBlockControlProps) {
   }
   
   return (
-    <div className="border-t pt-4">
+    <div className="border-t border-gray-100 pt-4">
       <Button
         onClick={handleToggleBlock}
         disabled={isProcessing}

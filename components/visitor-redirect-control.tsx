@@ -26,16 +26,17 @@ const Button = ({
 
 const Card = ({ children, className }: any) => (
   <div
-    className={`bg-white rounded-lg shadow-md border border-gray-200 ${
+    className={`bg-white rounded-2xl border border-gray-100/80 ${
       className || ""
     }`}
+    style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)" }}
   >
     {children}
   </div>
 );
 
 const CardHeader = ({ children, className }: any) => (
-  <div className={`p-6 border-b border-gray-200 ${className || ""}`}>
+  <div className={`p-6 border-b border-gray-100 ${className || ""}`}>
     {children}
   </div>
 );

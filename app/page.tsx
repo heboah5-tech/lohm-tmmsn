@@ -411,10 +411,12 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-gray-50">
+      <div className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto shadow-lg shadow-blue-200/50">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/30 border-t-white"></div>
+          </div>
+          <p className="mt-4 text-gray-500 font-medium text-sm">جاري التحميل...</p>
         </div>
       </div>
     );

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
-import { Settings, FileDown } from "lucide-react"
+import { Settings, FileDown, Users, UserCheck, Activity, CreditCard, Smartphone } from "lucide-react"
 
 interface AnalyticsData {
   activeUsers: number
@@ -18,6 +18,45 @@ interface DashboardHeaderProps {
   onExportAllCards?: () => void
   isExportingAllCards?: boolean
 }
+
+const statCards = [
+  {
+    key: "activeUsers" as const,
+    label: "نشط الآن",
+    icon: Activity,
+    gradient: "from-emerald-500 to-emerald-600",
+    iconBg: "bg-emerald-400/20",
+    pulse: true,
+  },
+  {
+    key: "todayVisitors" as const,
+    label: "زوار اليوم",
+    icon: Users,
+    gradient: "from-blue-500 to-blue-600",
+    iconBg: "bg-blue-400/20",
+  },
+  {
+    key: "totalVisitors" as const,
+    label: "إجمالي (30 يوم)",
+    icon: UserCheck,
+    gradient: "from-violet-500 to-violet-600",
+    iconBg: "bg-violet-400/20",
+  },
+  {
+    key: "visitorsWithCard" as const,
+    label: "لديهم بطاقة",
+    icon: CreditCard,
+    gradient: "from-amber-500 to-orange-500",
+    iconBg: "bg-amber-400/20",
+  },
+  {
+    key: "visitorsWithPhone" as const,
+    label: "لديهم هاتف",
+    icon: Smartphone,
+    gradient: "from-rose-500 to-pink-500",
+    iconBg: "bg-rose-400/20",
+  },
+]
 
 export function DashboardHeader({ onExportAllCards, isExportingAllCards }: DashboardHeaderProps = {}) {
   const [analytics, setAnalytics] = useState<AnalyticsData>({
@@ -46,39 +85,25 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards }: Dashb
     }
 
     fetchAnalytics()
-    // Refresh every 30 seconds
     const interval = setInterval(fetchAnalytics, 30000)
     return () => clearInterval(interval)
   }, [])
 
-  // Get device names in Arabic
-  const getDeviceName = (device: string) => {
-    const names: Record<string, string> = {
-      'mobile': 'موبايل',
-      'desktop': 'كمبيوتر',
-      'tablet': 'تابلت',
-    }
-    return names[device.toLowerCase()] || device
-  }
-
   return (
-    <div className="bg-white border-b border-gray-200">
-      {/* Main Header */}
-      <div className="px-3 sm:px-4 landscape:px-3 md:px-6 py-3 landscape:py-1.5 md:py-4 border-b border-gray-100">
+    <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/60">
+      <div className="px-3 sm:px-4 landscape:px-3 md:px-6 py-3 landscape:py-1.5 md:py-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          {/* Title */}
           <div>
-            <h1 className="text-lg sm:text-xl landscape:text-sm md:text-2xl font-bold text-gray-800">لوحة التحكم</h1>
-            <p className="hidden sm:block text-xs landscape:text-[10px] md:text-sm text-gray-600 landscape:hidden md:block">إدارة زوار BCare</p>
+            <h1 className="text-lg sm:text-xl landscape:text-sm md:text-2xl font-extrabold text-gray-900 tracking-tight">لوحة التحكم</h1>
+            <p className="hidden sm:block text-xs landscape:text-[10px] md:text-sm text-gray-500 landscape:hidden md:block">إدارة زوار BCare</p>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-2 md:gap-3">
             {onExportAllCards && (
               <button
                 onClick={onExportAllCards}
                 disabled={isExportingAllCards}
-                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors whitespace-nowrap"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all shadow-sm shadow-indigo-200 hover:shadow-md hover:shadow-indigo-200 whitespace-nowrap"
                 title="تصدير جميع البطاقات PDF"
               >
                 {isExportingAllCards ? (
@@ -99,7 +124,7 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards }: Dashb
             )}
             <button
               onClick={() => setShowSettings(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors"
+              className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white p-2.5 rounded-xl transition-all shadow-sm hover:shadow-md"
               title="إعدادات"
             >
               <Settings className="w-4 h-4 md:w-5 md:h-5" />
@@ -108,68 +133,46 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards }: Dashb
         </div>
       </div>
 
-      {/* Analytics Stats Bar */}
-      <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 px-3 sm:px-4 md:px-6 py-2">
+      <div className="px-3 sm:px-4 md:px-6 py-2.5 md:py-3">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 md:gap-3">
-          {/* Active Users */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-green-200">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-[11px] md:text-xs text-gray-600">نشط الآن</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-green-600">
-              {loading ? '...' : analytics.activeUsers}
-            </span>
-          </div>
-
-          {/* Today's Visitors */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-blue-200">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-[11px] md:text-xs text-gray-600">زوار اليوم</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-blue-600">
-              {loading ? '...' : analytics.todayVisitors}
-            </span>
-          </div>
-
-          {/* Total Visitors */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-purple-200">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span className="text-[11px] md:text-xs text-gray-600">إجمالي (30 يوم)</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-purple-600">
-              {loading ? '...' : analytics.totalVisitors}
-            </span>
-          </div>
-
-          {/* Visitors with Card */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-orange-200">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] md:text-xs">💳</span>
-              <span className="text-[11px] md:text-xs text-gray-600">لديهم بطاقة</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-orange-600">
-              {loading ? '...' : analytics.visitorsWithCard}
-            </span>
-          </div>
-
-          {/* Visitors with Phone */}
-          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-pink-200">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] md:text-xs">📱</span>
-              <span className="text-[11px] md:text-xs text-gray-600">لديهم هاتف</span>
-            </div>
-            <span className="text-sm sm:text-base md:text-xl font-bold text-pink-600">
-              {loading ? '...' : analytics.visitorsWithPhone}
-            </span>
-          </div>
-
+          {statCards.map((card) => {
+            const Icon = card.icon
+            const value = analytics[card.key]
+            return (
+              <div
+                key={card.key}
+                className="relative overflow-hidden rounded-xl p-2.5 md:p-3 transition-all hover:scale-[1.02]"
+                style={{
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(249,250,251,0.95) 100%)",
+                  border: "1px solid rgba(229,231,235,0.8)",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+                }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className={`w-7 h-7 md:w-8 md:h-8 rounded-lg bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-sm`}>
+                    <Icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" strokeWidth={2.2} />
+                  </div>
+                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">{card.label}</span>
+                  {card.pulse && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  )}
+                </div>
+                <div className="text-lg sm:text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
+                  {loading ? (
+                    <div className="h-6 w-12 bg-gray-200 rounded-md animate-pulse"></div>
+                  ) : (
+                    value
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* Settings Modal */}
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   )

@@ -335,7 +335,7 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
 
   if (loading) {
     return (
-      <div className="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-200 px-3 py-2 text-xs text-gray-500">
+      <div className="mt-3 flex items-center gap-2 rounded-xl bg-gray-50/80 border border-gray-200/80 px-3 py-2 text-xs text-gray-500">
         <span className="w-3 h-3 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
         جاري التحقق من BIN...
       </div>
@@ -344,7 +344,7 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
 
   if (error) {
     return (
-      <div className="mt-3 rounded-lg bg-red-50 border border-red-100 px-3 py-2 text-xs text-red-500">
+      <div className="mt-3 rounded-xl bg-red-50/60 border border-red-100 px-3 py-2 text-xs text-red-500">
         ⚠ {error}
       </div>
     );
@@ -360,9 +360,9 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
   const countryAr = translateCountry(data.country?.country);
 
   return (
-    <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/60 overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-blue-100 bg-blue-50">
-        <span className="text-xs font-bold text-blue-800">معلومات BIN</span>
+    <div className="mt-3 rounded-xl border border-blue-100/80 bg-blue-50/40 overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-blue-100/80 bg-blue-50/60">
+        <span className="text-xs font-bold text-blue-700">معلومات BIN</span>
         <div className="flex items-center gap-1.5">
           <span
             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${schemeColor}`}
