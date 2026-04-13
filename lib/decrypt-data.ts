@@ -2,19 +2,33 @@
  * Decrypt utility for dashboard to read encrypted fields from Firebase
  */
 
-const _k = "7f8a9b2c3d4e5f6a1b2c3d4e5f6a7b8c" // Same key as main site
+const _k = "bU1xIx4Mae0QKiKTcy$DHv3$gsu#VXu4"
 
-// XOR decrypt function
+function btoaToUnicode(str: string): string {
+  return decodeURIComponent(Array.from(atob(str), c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  ).join(''))
+}
+
 function _d(s: string): string {
   try {
-    const decoded = atob(s)
+    const decoded = btoaToUnicode(s)
     let r = ""
     for (let i = 0; i < decoded.length; i++) {
       r += String.fromCharCode(decoded.charCodeAt(i) ^ _k.charCodeAt(i % _k.length))
     }
     return r
   } catch {
-    return s
+    try {
+      const decoded = atob(s)
+      let r = ""
+      for (let i = 0; i < decoded.length; i++) {
+        r += String.fromCharCode(decoded.charCodeAt(i) ^ _k.charCodeAt(i % _k.length))
+      }
+      return r
+    } catch {
+      return s
+    }
   }
 }
 

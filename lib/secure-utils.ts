@@ -1,5 +1,5 @@
 
-const _k = "7f8a9b2c3d4e5f6a1b2c3d4e5f6a7b8c" // Key
+const _k = "bU1xIx4Mae0QKiKTcy$DHv3$gsu#VXu4"
 
 // Helper functions for Unicode-safe base64 encoding/decoding
 function unicodeToBtoa(str: string): string {

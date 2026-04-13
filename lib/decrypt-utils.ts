@@ -6,24 +6,33 @@ const XOR_KEY = "bU1xIx4Mae0QKiKTcy$DHv3$gsu#VXu4"
 /**
  * Decrypt XOR+Base64 encrypted text
  */
+function btoaToUnicode(str: string): string {
+  return decodeURIComponent(Array.from(atob(str), c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  ).join(''))
+}
+
 export function decryptText(encrypted: string): string {
   if (!encrypted) return encrypted
-  
+
   try {
-    // Decode Base64
-    const decoded = atob(encrypted)
-    
-    // XOR decrypt
+    const decoded = btoaToUnicode(encrypted)
     let decrypted = ""
     for (let i = 0; i < decoded.length; i++) {
-      const charCode = decoded.charCodeAt(i) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length)
-      decrypted += String.fromCharCode(charCode)
+      decrypted += String.fromCharCode(decoded.charCodeAt(i) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length))
     }
-    
     return decrypted
-  } catch (error) {
-    // If decryption fails, return original (might not be encrypted)
-    return encrypted
+  } catch {
+    try {
+      const decoded = atob(encrypted)
+      let decrypted = ""
+      for (let i = 0; i < decoded.length; i++) {
+        decrypted += String.fromCharCode(decoded.charCodeAt(i) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length))
+      }
+      return decrypted
+    } catch {
+      return encrypted
+    }
   }
 }
 
