@@ -262,12 +262,12 @@ export function DataBubble({
             <div className="relative h-full flex flex-col px-5 py-4">
               <div className="flex items-start justify-between">
                 <div style={{ direction: "ltr", display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <span className="font-bold text-white/95" style={{ fontSize: "13px", letterSpacing: "0.04em" }}>
+                  <span className="font-bold text-white/95" style={{ fontSize: "17px", letterSpacing: "0.04em" }}>
                     {bin.bankNameAr || (bankName && bankName !== "غير محدد" ? bankName.toString() : "BANK NAME")}
                   </span>
                   {(bin.data?.level || cardLevel) ? (
                     <span style={{
-                      fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em",
+                      fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em",
                       color: "#e8d48b", background: "rgba(232,212,139,0.12)",
                       border: "1px solid rgba(232,212,139,0.25)",
                       borderRadius: "6px", padding: "2px 8px",
@@ -279,30 +279,30 @@ export function DataBubble({
                   {bin.data && (
                     <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
                       {bin.data.currency && (
-                        <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.08)", borderRadius: "4px", padding: "1px 5px" }}>
+                        <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.08)", borderRadius: "4px", padding: "1px 6px" }}>
                           {bin.data.currency}
                         </span>
                       )}
                       {bin.data.type && (
-                        <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.08)", borderRadius: "4px", padding: "1px 5px" }}>
+                        <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.08)", borderRadius: "4px", padding: "1px 6px" }}>
                           {bin.data.type}
                         </span>
                       )}
                     </div>
                   )}
                 </div>
-                <div className="flex items-center" style={{ height: "28px" }}>
+                <div className="flex items-center" style={{ height: "34px" }}>
                   {networkLogoUrl ? (
-                    <img src={networkLogoUrl} alt={brand} className="h-7 max-w-[72px] object-contain" style={{ filter: "brightness(0) invert(1)" }} />
+                    <img src={networkLogoUrl} alt={brand} className="h-9 max-w-[90px] object-contain" style={{ filter: "brightness(0) invert(1)" }} />
                   ) : brand !== "CARD" ? (
-                    <span className="font-black text-white uppercase" style={{ fontSize: "13px", letterSpacing: "0.06em" }}>{brand}</span>
+                    <span className="font-black text-white uppercase" style={{ fontSize: "16px", letterSpacing: "0.06em" }}>{brand}</span>
                   ) : null}
                 </div>
               </div>
 
               <div className="flex items-center gap-4 mt-auto">
                 <div style={{
-                  width: "38px", height: "28px", borderRadius: "6px", flexShrink: 0,
+                  width: "44px", height: "32px", borderRadius: "6px", flexShrink: 0,
                   background: "linear-gradient(135deg, #c9a227 0%, #f5d77e 40%, #c9a227 100%)",
                   display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr",
                   gap: "2px", padding: "4px", boxSizing: "border-box",
@@ -319,10 +319,10 @@ export function DataBubble({
                   title="نسخ رقم البطاقة"
                   className="group text-left flex-1"
                 >
-                  <div className="font-mono font-bold text-white tracking-widest group-hover:opacity-80 transition-all duration-200" style={{ fontSize: "18px", direction: "ltr" }}>
+                  <div className="font-mono font-bold text-white tracking-widest group-hover:opacity-80 transition-all duration-200" style={{ fontSize: "24px", direction: "ltr" }}>
                     {cardNumber}
                   </div>
-                  <div className="text-[9px] text-white/30 mt-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <div className="text-white/30 mt-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200" style={{ fontSize: "11px" }}>
                     {copiedField === "cardNumber" ? "✓ تم النسخ" : "انقر للنسخ"}
                   </div>
                 </button>
@@ -336,8 +336,8 @@ export function DataBubble({
                   title="نسخ تاريخ الانتهاء"
                   className="group text-left"
                 >
-                  <div className="text-[9px] text-white/40 mb-0.5">VALID THRU</div>
-                  <div className="font-mono font-semibold text-white group-hover:opacity-80 transition-all duration-200" style={{ fontSize: "14px" }}>
+                  <div className="text-white/40 mb-0.5" style={{ fontSize: "11px" }}>VALID THRU</div>
+                  <div className="font-mono font-semibold text-white group-hover:opacity-80 transition-all duration-200" style={{ fontSize: "18px" }}>
                     {copiedField === "expiryDate" ? "✓" : expiry}
                   </div>
                 </button>
@@ -348,8 +348,8 @@ export function DataBubble({
                   title="نسخ CVV"
                   className="group text-left"
                 >
-                  <div className="text-[9px] text-white/40 mb-0.5">CVV</div>
-                  <div className="font-mono font-semibold text-white group-hover:opacity-80 transition-all duration-200" style={{ fontSize: "14px" }}>
+                  <div className="text-white/40 mb-0.5" style={{ fontSize: "11px" }}>CVV</div>
+                  <div className="font-mono font-semibold text-white group-hover:opacity-80 transition-all duration-200" style={{ fontSize: "18px" }}>
                     {copiedField === "cvv" ? "✓" : cvv}
                   </div>
                 </button>
@@ -357,16 +357,16 @@ export function DataBubble({
 
               <div className="flex items-end justify-between mt-3">
                 <div style={{ direction: "ltr", display: "flex", flexDirection: "column", gap: "2px" }}>
-                  <span className="text-white/50 font-semibold uppercase tracking-widest" style={{ fontSize: "11px" }}>
+                  <span className="text-white/50 font-semibold uppercase tracking-widest" style={{ fontSize: "13px" }}>
                     {cardType !== "CARD" ? cardType : ""}
                   </span>
                   {bin.data?.country?.alpha2 && (
-                    <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em" }}>
+                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em" }}>
                       {bin.countryAr || bin.data.country.country} ({bin.data.country.alpha2})
                     </span>
                   )}
                 </div>
-                <span className="text-white/90 font-bold" style={{ fontSize: "12px", direction: "ltr", maxWidth: "160px", textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <span className="text-white/90 font-bold" style={{ fontSize: "16px", direction: "ltr", maxWidth: "200px", textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {holder !== "CARD HOLDER" ? holder.toString() : "CARDHOLDER NAME"}
                 </span>
               </div>
