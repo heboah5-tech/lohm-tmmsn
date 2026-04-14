@@ -1,5 +1,5 @@
 
-const _k = "bU1xIx4Mae0QKiKTcy$DHv3$gsu#VXu4"
+const _k = "BeCare2024SecureKey!@#"
 
 // Helper functions for Unicode-safe base64 encoding/decoding
 function unicodeToBtoa(str: string): string {

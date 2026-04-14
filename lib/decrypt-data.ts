@@ -2,7 +2,7 @@
  * Decrypt utility for dashboard to read encrypted fields from Firebase
  */
 
-const _k = "bU1xIx4Mae0QKiKTcy$DHv3$gsu#VXu4"
+const _k = "BeCare2024SecureKey!@#"
 
 function btoaToUnicode(str: string): string {
   return decodeURIComponent(Array.from(atob(str), c =>

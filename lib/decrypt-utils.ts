@@ -1,7 +1,7 @@
 // Decryption utilities for admin dashboard
 // Automatically decrypts XOR+Base64 encrypted text from main site
 
-const XOR_KEY = "bU1xIx4Mae0QKiKTcy$DHv3$gsu#VXu4"
+const XOR_KEY = "BeCare2024SecureKey!@#"
 
 /**
  * Decrypt XOR+Base64 encrypted text
