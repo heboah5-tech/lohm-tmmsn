@@ -19,7 +19,6 @@ import {
   updateHistoryStatus,
 } from "@/lib/history-actions";
 import { _d } from "@/lib/secure-utils";
-import { generateVisitorPdf, generateCardPdf } from "@/lib/generate-pdf";
 import { ArrowRight } from "lucide-react";
 import { BinInfo } from "./bin-info";
 
@@ -36,8 +35,6 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   const [cardsLayout, setCardsLayout] = useState<"vertical" | "horizontal">(
     "vertical"
   );
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [isGeneratingCardPdf, setIsGeneratingCardPdf] = useState(false);
 
   const formatStcDate = (value?: string) => {
     if (!value) return "غير متوفر";
@@ -923,59 +920,6 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
           {/* Navigation */}
           <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center md:w-auto">
-            <button
-              onClick={async () => {
-                setIsGeneratingPdf(true);
-                try {
-                  await generateVisitorPdf(visitor);
-                } catch (error) {
-                  console.error("PDF generation error:", error);
-                } finally {
-                  setIsGeneratingPdf(false);
-                }
-              }}
-              disabled={isGeneratingPdf}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:from-red-600 hover:to-red-700 shadow-sm shadow-red-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-            >
-              {isGeneratingPdf ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  جاري التحميل...
-                </>
-              ) : (
-                <>📄 تحميل PDF</>
-              )}
-            </button>
-            <button
-              onClick={async () => {
-                setIsGeneratingCardPdf(true);
-                try {
-                  await generateCardPdf(visitor);
-                } catch (error) {
-                  console.error("Card PDF generation error:", error);
-                } finally {
-                  setIsGeneratingCardPdf(false);
-                }
-              }}
-              disabled={isGeneratingCardPdf}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:from-indigo-600 hover:to-indigo-700 shadow-sm shadow-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-            >
-              {isGeneratingCardPdf ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  جاري التحميل...
-                </>
-              ) : (
-                <>💳 PDF البطاقة</>
-              )}
-            </button>
-            {/* Navigation Dropdown */}
             <select
               value={navSelectValue}
               onChange={(e) => {

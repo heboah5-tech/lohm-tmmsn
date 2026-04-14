@@ -181,8 +181,6 @@ export function VisitorSidebar({
 }: VisitorSidebarProps) {
   const allSelected =
     visitors.length > 0 && selectedIds.size === visitors.length;
-  const unreadCount = visitors.filter((visitor) => visitor.isUnread).length;
-  const waitingCount = visitors.filter(isWaitingForAdmin).length;
   const isLandscape =
     typeof window !== "undefined" &&
     window.matchMedia("(orientation: landscape) and (max-width: 1024px)")
@@ -197,21 +195,6 @@ export function VisitorSidebar({
       }}
     >
       <div className="p-3 sm:p-4 landscape:p-2 border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <h1 className="text-xl landscape:text-base font-extrabold text-gray-900 dark:text-white mb-3 landscape:mb-2 tracking-tight">
-          لوحة التحكم
-        </h1>
-        <div className="mb-3 flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800">
-            إجمالي: {visitors.length}
-          </span>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800">
-            غير مقروء: {unreadCount}
-          </span>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800">
-            قيد المراجعة: {waitingCount}
-          </span>
-        </div>
-
         <div className="relative mb-3 landscape:mb-2">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 landscape:w-3.5 landscape:h-3.5 text-gray-400" />
           <input

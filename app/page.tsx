@@ -6,7 +6,6 @@ import {
   updateApplication,
   deleteMultipleApplications,
 } from "@/lib/firebase-services";
-import { generateAllCardsPdf } from "@/lib/generate-pdf";
 import type { InsuranceApplication } from "@/lib/firestore-types";
 import { VisitorSidebar } from "@/components/visitor-sidebar";
 import { VisitorDetails } from "@/components/visitor-details";
@@ -150,7 +149,6 @@ export default function Dashboard() {
   const [cardFilter, setCardFilter] = useState<"all" | "hasCard">("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [isExportingAllCards, setIsExportingAllCards] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(215); // Default landscape width
   const hasLoadedInitialSnapshotRef = useRef(false);
   const previousUnreadIds = useRef<Set<string>>(new Set());
@@ -355,17 +353,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleExportAllCards = async () => {
-    setIsExportingAllCards(true);
-    try {
-      await generateAllCardsPdf(applications);
-    } catch (error) {
-      console.error("Export all cards error:", error);
-    } finally {
-      setIsExportingAllCards(false);
-    }
-  };
-
   // Handle delete selected
   const handleDeleteSelected = async () => {
     if (selectedIds.size === 0) return;
@@ -427,10 +414,7 @@ export default function Dashboard() {
       className="min-h-full h-full flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900"
       dir="rtl"
     >
-      <DashboardHeader
-        onExportAllCards={handleExportAllCards}
-        isExportingAllCards={isExportingAllCards}
-      />
+      <DashboardHeader />
       <div className="flex-1 flex overflow-hidden">
         <div
           className={`${
