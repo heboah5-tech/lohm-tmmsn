@@ -13,7 +13,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase";
+import { getFirebaseAuth } from "@/lib/firebase";
 import { useAuth } from "@/lib/auth-context";
 
 export default function LoginPage() {
@@ -37,7 +37,7 @@ export default function LoginPage() {
     setMessage("");
     setLoading(true);
     try {
-      await sendSignInLinkToEmail(auth, email, {
+      await sendSignInLinkToEmail(getFirebaseAuth(), email, {
         url: `${window.location.origin}/login`,
         handleCodeInApp: true,
       });
@@ -52,14 +52,14 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    if (isSignInWithEmailLink(auth, window.location.href)) {
+    if (isSignInWithEmailLink(getFirebaseAuth(), window.location.href)) {
       let emailToUse = window.localStorage.getItem("emailForSignIn");
       if (!emailToUse) {
         emailToUse = window.prompt("يرجى إدخال بريدك الإلكتروني للتأكيد:");
       }
       if (emailToUse) {
         setLoading(true);
-        signInWithEmailLink(auth, emailToUse, window.location.href)
+        signInWithEmailLink(getFirebaseAuth(), emailToUse, window.location.href)
           .then(() => {
             window.localStorage.removeItem("emailForSignIn");
             navigate.push("/");

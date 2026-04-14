@@ -4,8 +4,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AppToaster } from "@/components/app-toaster";
 import { ZoomFontControls } from "@/components/zoom-font-controls";
-import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/lib/auth-context";
+import { ClientProviders } from "@/components/client-providers";
 
 export const metadata: Metadata = {
   title: "لوحة التحكم - BCare",
@@ -27,13 +26,11 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ThemeProvider>
-          <AuthProvider>
-            {children}
-            <AppToaster />
-            <ZoomFontControls />
-          </AuthProvider>
-        </ThemeProvider>
+        <ClientProviders>
+          {children}
+          <AppToaster />
+          <ZoomFontControls />
+        </ClientProviders>
       </body>
     </html>
   );

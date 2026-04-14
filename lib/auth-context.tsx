@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { User, onAuthStateChanged } from "firebase/auth"
-import { auth } from "./firebase"
+import { getFirebaseAuth } from "./firebase"
 import { useRouter } from "next/navigation"
 
 interface AuthContextType {
@@ -23,17 +23,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser)
+    try {
+      const authInstance = getFirebaseAuth()
+      const unsubscribe = onAuthStateChanged(authInstance, (firebaseUser) => {
+        setUser(firebaseUser)
+        setLoading(false)
+      })
+      return () => unsubscribe()
+    } catch {
       setLoading(false)
-    })
-
-    return () => unsubscribe()
+    }
   }, [])
 
   const logout = async () => {
     try {
-      await auth.signOut()
+      const authInstance = getFirebaseAuth()
+      await authInstance.signOut()
       router.push("/login")
     } catch (error) {
       console.error("Logout error:", error)
