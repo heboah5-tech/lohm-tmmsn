@@ -399,6 +399,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
+      <ProtectedRoute>
       <div className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900">
         <div className="text-center">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto shadow-lg shadow-blue-200/50">
@@ -407,10 +408,12 @@ export default function Dashboard() {
           <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium text-sm">جاري التحميل...</p>
         </div>
       </div>
+      </ProtectedRoute>
     );
   }
 
   return (
+    <ProtectedRoute>
     <div
       className="min-h-full h-full flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900"
       dir="rtl"
@@ -481,5 +484,6 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }
