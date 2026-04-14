@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "./theme-provider";
 
 const ZOOM_STEP = 0.05;
 const ZOOM_MIN = 0.5;
@@ -16,6 +17,7 @@ export function ZoomFontControls() {
   const [zoom, setZoom] = useState(ZOOM_DEFAULT);
   const [fontSize, setFontSize] = useState(FONT_DEFAULT);
   const [open, setOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     document.body.style.zoom = String(zoom);
@@ -46,6 +48,8 @@ export function ZoomFontControls() {
     setFontSize(FONT_DEFAULT);
   };
 
+  const isDark = theme === "dark";
+
   return (
     <div
       style={{
@@ -60,38 +64,69 @@ export function ZoomFontControls() {
         fontFamily: "Cairo, Tajawal, sans-serif",
       }}
     >
-      <button
-        onClick={() => setOpen((o) => !o)}
-        title="إعدادات العرض"
-        style={{
-          width: "40px",
-          height: "40px",
-          borderRadius: "14px",
-          background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-          color: "#fff",
-          border: "none",
-          cursor: "pointer",
-          fontSize: "16px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 4px 12px rgba(37,99,235,0.3), 0 1px 3px rgba(0,0,0,0.1)",
-          flexShrink: 0,
-          transition: "all 0.2s ease",
-        }}
-      >
-        {open ? "✕" : "⚙"}
-      </button>
+      <div style={{ display: "flex", gap: "6px" }}>
+        <button
+          onClick={() => setOpen((o) => !o)}
+          title="إعدادات العرض"
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "14px",
+            background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(37,99,235,0.3), 0 1px 3px rgba(0,0,0,0.1)",
+            flexShrink: 0,
+            transition: "all 0.2s ease",
+          }}
+        >
+          {open ? "✕" : "⚙"}
+        </button>
+
+        <button
+          onClick={toggleTheme}
+          title={isDark ? "الوضع الفاتح" : "الوضع الداكن"}
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "14px",
+            background: isDark
+              ? "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+              : "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "18px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: isDark
+              ? "0 4px 12px rgba(245,158,11,0.3), 0 1px 3px rgba(0,0,0,0.1)"
+              : "0 4px 12px rgba(15,23,42,0.3), 0 1px 3px rgba(0,0,0,0.1)",
+            flexShrink: 0,
+            transition: "all 0.3s ease",
+          }}
+        >
+          {isDark ? "☀" : "🌙"}
+        </button>
+      </div>
 
       {open && (
         <div
           style={{
-            background: "rgba(255,255,255,0.95)",
+            background: isDark ? "rgba(30,41,59,0.95)" : "rgba(255,255,255,0.95)",
             backdropFilter: "blur(20px)",
-            border: "1px solid rgba(229,231,235,0.8)",
+            border: isDark ? "1px solid rgba(71,85,105,0.6)" : "1px solid rgba(229,231,235,0.8)",
             borderRadius: "16px",
             padding: "14px 16px",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.05)",
+            boxShadow: isDark
+              ? "0 8px 32px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.2)"
+              : "0 8px 32px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.05)",
             display: "flex",
             flexDirection: "column",
             gap: "12px",
@@ -99,16 +134,16 @@ export function ZoomFontControls() {
           }}
         >
           <div>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "#6b7280", marginBottom: "6px", direction: "rtl" }}>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: isDark ? "#94a3b8" : "#6b7280", marginBottom: "6px", direction: "rtl" }}>
               تكبير / تصغير العرض
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <Btn onClick={() => changeZoom(-ZOOM_STEP)} disabled={zoom <= ZOOM_MIN} title="تصغير">−</Btn>
-              <span style={{ fontSize: "12px", fontWeight: 700, color: "#111827", minWidth: "38px", textAlign: "center", direction: "ltr" }}>
+              <Btn onClick={() => changeZoom(-ZOOM_STEP)} disabled={zoom <= ZOOM_MIN} title="تصغير" dark={isDark}>−</Btn>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: isDark ? "#e2e8f0" : "#111827", minWidth: "38px", textAlign: "center", direction: "ltr" }}>
                 {Math.round(zoom * 100)}%
               </span>
-              <Btn onClick={() => changeZoom(ZOOM_STEP)} disabled={zoom >= ZOOM_MAX} title="تكبير">+</Btn>
-              <Btn onClick={() => setZoom(1)} title="إعادة تعيين" small>↺</Btn>
+              <Btn onClick={() => changeZoom(ZOOM_STEP)} disabled={zoom >= ZOOM_MAX} title="تكبير" dark={isDark}>+</Btn>
+              <Btn onClick={() => setZoom(1)} title="إعادة تعيين" small dark={isDark}>↺</Btn>
             </div>
             <input
               type="range"
@@ -122,16 +157,16 @@ export function ZoomFontControls() {
           </div>
 
           <div>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "#6b7280", marginBottom: "6px", direction: "rtl" }}>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: isDark ? "#94a3b8" : "#6b7280", marginBottom: "6px", direction: "rtl" }}>
               حجم الخط
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <Btn onClick={() => changeFont(-FONT_STEP)} disabled={fontSize <= FONT_MIN} title="تصغير الخط">A−</Btn>
-              <span style={{ fontSize: "12px", fontWeight: 700, color: "#111827", minWidth: "38px", textAlign: "center", direction: "ltr" }}>
+              <Btn onClick={() => changeFont(-FONT_STEP)} disabled={fontSize <= FONT_MIN} title="تصغير الخط" dark={isDark}>A−</Btn>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: isDark ? "#e2e8f0" : "#111827", minWidth: "38px", textAlign: "center", direction: "ltr" }}>
                 {fontSize}px
               </span>
-              <Btn onClick={() => changeFont(FONT_STEP)} disabled={fontSize >= FONT_MAX} title="تكبير الخط">A+</Btn>
-              <Btn onClick={() => setFontSize(FONT_DEFAULT)} title="إعادة تعيين" small>↺</Btn>
+              <Btn onClick={() => changeFont(FONT_STEP)} disabled={fontSize >= FONT_MAX} title="تكبير الخط" dark={isDark}>A+</Btn>
+              <Btn onClick={() => setFontSize(FONT_DEFAULT)} title="إعادة تعيين" small dark={isDark}>↺</Btn>
             </div>
             <input
               type="range"
@@ -147,13 +182,15 @@ export function ZoomFontControls() {
           <button
             onClick={reset}
             style={{
-              background: "linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)",
-              border: "1px solid #d1d5db",
+              background: isDark
+                ? "linear-gradient(135deg, #334155 0%, #1e293b 100%)"
+                : "linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)",
+              border: isDark ? "1px solid #475569" : "1px solid #d1d5db",
               borderRadius: "10px",
               padding: "6px 12px",
               fontSize: "11px",
               fontWeight: 700,
-              color: "#374151",
+              color: isDark ? "#cbd5e1" : "#374151",
               cursor: "pointer",
               direction: "rtl",
               transition: "all 0.2s ease",
@@ -172,12 +209,14 @@ function Btn({
   disabled,
   title,
   small,
+  dark,
   children,
 }: {
   onClick: () => void;
   disabled?: boolean;
   title?: string;
   small?: boolean;
+  dark?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -189,9 +228,13 @@ function Btn({
         width: small ? "28px" : "32px",
         height: "32px",
         borderRadius: "10px",
-        border: "1px solid #e5e7eb",
-        background: disabled ? "#f9fafb" : "#fff",
-        color: disabled ? "#d1d5db" : "#111827",
+        border: dark ? "1px solid #475569" : "1px solid #e5e7eb",
+        background: disabled
+          ? dark ? "#1e293b" : "#f9fafb"
+          : dark ? "#334155" : "#fff",
+        color: disabled
+          ? dark ? "#475569" : "#d1d5db"
+          : dark ? "#e2e8f0" : "#111827",
         cursor: disabled ? "not-allowed" : "pointer",
         fontSize: small ? "13px" : "14px",
         fontWeight: 700,

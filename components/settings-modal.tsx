@@ -143,7 +143,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 backdrop-blur-md sm:p-4">
-      <div className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white sm:rounded-3xl"
+      <div className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white dark:bg-slate-900 sm:rounded-3xl"
         style={{ boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05)" }}>
         <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-4 text-white sm:p-6">
           <div className="flex items-center justify-between">
@@ -157,13 +157,13 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 border-b border-gray-100">
+        <div className="grid grid-cols-2 border-b border-gray-100 dark:border-slate-800">
           <button
             onClick={() => setActiveTab("cards")}
             className={`px-2 py-3 text-xs font-semibold transition-all duration-200 sm:px-6 sm:py-4 sm:text-base ${
               activeTab === "cards"
-                ? "text-blue-600 border-b-2 border-blue-500 bg-blue-50/50"
-                : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                ? "text-blue-600 dark:text-blue-400 border-b-2 border-blue-500 bg-blue-50/50 dark:bg-blue-950/30"
+                : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-slate-300"
             }`}
           >
             <div className="flex items-center justify-center gap-1.5 sm:gap-2">
@@ -175,8 +175,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             onClick={() => setActiveTab("countries")}
             className={`px-2 py-3 text-xs font-semibold transition-all duration-200 sm:px-6 sm:py-4 sm:text-base ${
               activeTab === "countries"
-                ? "text-violet-600 border-b-2 border-violet-500 bg-violet-50/50"
-                : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                ? "text-violet-600 dark:text-violet-400 border-b-2 border-violet-500 bg-violet-50/50 dark:bg-violet-950/30"
+                : "text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-slate-300"
             }`}
           >
             <div className="flex items-center justify-center gap-1.5 sm:gap-2">
@@ -190,22 +190,22 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           {activeTab === "cards" ? (
             <div className="space-y-6">
               <div className="text-center">
-                <h3 className="mb-2 text-lg font-bold text-gray-800 sm:text-xl">قائمة حجب بطاقات الدفع</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="mb-2 text-lg font-bold text-gray-800 dark:text-slate-200 sm:text-xl">قائمة حجب بطاقات الدفع</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                   أضف البيانات الخاصة بأرقام البطاقات التي لا تريده. يمكنك إضافة مجموعة من البيانات
                   <br className="hidden sm:block" />
                   مفصولة بفاصلة أو فاصلة أو سطر جديد. اضغط Enter لإضافة كل بلوك.
                 </p>
               </div>
 
-              <div className="bg-blue-50/60 rounded-2xl p-4 border border-blue-100">
+              <div className="bg-blue-50/60 dark:bg-blue-950/30 rounded-2xl p-4 border border-blue-100 dark:border-blue-800">
                 <textarea
                   value={newBinsInput}
                   onChange={(e) => setNewBinsInput(e.target.value)}
                   placeholder="مثال: 4890, 4458, 4909&#10;أو كل رقم في سطر منفصل"
                   rows={4}
                   dir="ltr"
-                  className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-base font-mono focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:text-lg transition-all duration-200"
+                  className="w-full resize-none rounded-xl border border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 px-4 py-3 text-base font-mono focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:text-lg transition-all duration-200"
                 />
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <button
@@ -227,7 +227,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
               <div>
                 {settings.blockedCardBins.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-gray-400 dark:text-slate-500">
                     <CreditCard className="w-12 h-12 mx-auto mb-2 opacity-30" />
                     <p>لا توجد بطاقات محظورة</p>
                   </div>
@@ -236,9 +236,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     {settings.blockedCardBins.map((bin) => (
                       <div
                         key={bin}
-                        className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 flex items-center gap-2 transition-all duration-200 hover:border-gray-300"
+                        className="bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2 flex items-center gap-2 transition-all duration-200 hover:border-gray-300 dark:hover:border-slate-600"
                       >
-                        <span className="font-mono text-sm font-semibold text-gray-700">
+                        <span className="font-mono text-sm font-semibold text-gray-700 dark:text-slate-300">
                           {bin}
                         </span>
                         <button
@@ -257,23 +257,23 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           ) : (
             <div className="space-y-6">
               <div className="text-center">
-                <h3 className="mb-2 text-lg font-bold text-gray-800 sm:text-xl">تقييد الوصول حسب الدولة</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="mb-2 text-lg font-bold text-gray-800 dark:text-slate-200 sm:text-xl">تقييد الوصول حسب الدولة</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                   تحكم في الدول التي تسمح لها بالوصول إلى موقعك الإلكتروني للتعزيز الأمان.
                   <br className="hidden sm:block" />
                   يمكنك إضافة أكثر من دولة. وسيمنع الوصول من أي دولة غير موجودة في القائمة.
                 </p>
               </div>
 
-              <div className="bg-violet-50/60 rounded-2xl p-4 border border-violet-100">
-                <label className="block text-sm font-semibold text-gray-600 mb-2">
+              <div className="bg-violet-50/60 dark:bg-violet-950/30 rounded-2xl p-4 border border-violet-100 dark:border-violet-800">
+                <label className="block text-sm font-semibold text-gray-600 dark:text-slate-400 mb-2">
                   - الدول المسموح لها بالوصول -
                 </label>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <select
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-base focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all duration-200"
+                    className="flex-1 rounded-xl border border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 px-4 py-3 text-base focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all duration-200"
                     dir="rtl"
                   >
                     <option value="">اختر دولة...</option>
@@ -291,14 +291,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     حفظ
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">
                   يمكنك إضافة أكثر من دولة غير موجودة في القائمة.
                 </p>
               </div>
 
               <div>
                 {settings.allowedCountries.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-gray-400 dark:text-slate-500">
                     <Globe className="w-12 h-12 mx-auto mb-2 opacity-30" />
                     <p>جميع الدول مسموحة (لم يتم تحديد قيود)</p>
                   </div>
@@ -309,10 +309,10 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                       return (
                         <div
                           key={countryCode}
-                          className="bg-emerald-50/60 border border-emerald-200 rounded-xl px-4 py-2 flex items-center gap-2 transition-all duration-200 hover:border-emerald-300"
+                          className="bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl px-4 py-2 flex items-center gap-2 transition-all duration-200 hover:border-emerald-300 dark:hover:border-emerald-700"
                         >
                           <span className="text-lg">{country?.flag || "🌍"}</span>
-                          <span className="text-sm font-semibold text-gray-700">
+                          <span className="text-sm font-semibold text-gray-700 dark:text-slate-300">
                             {country?.name || countryCode}
                           </span>
                           <button
@@ -332,7 +332,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           )}
         </div>
 
-        <div className="flex gap-3 border-t border-gray-100 bg-gray-50/60 p-4">
+        <div className="flex gap-3 border-t border-gray-100 dark:border-slate-800 bg-gray-50/60 dark:bg-slate-800/60 p-4">
           <button
             onClick={onClose}
             className="flex-1 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white py-3 rounded-xl font-semibold transition-all duration-200 shadow-sm"

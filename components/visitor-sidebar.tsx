@@ -190,24 +190,24 @@ export function VisitorSidebar({
 
   return (
     <div
-      className="h-full w-full bg-white/95 backdrop-blur-md landscape:border-l md:w-[400px] md:border-l border-gray-200/60 flex flex-col relative group"
+      className="h-full w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md landscape:border-l md:w-[400px] md:border-l border-gray-200/60 dark:border-slate-700/60 flex flex-col relative group"
       style={{
         fontFamily: "Cairo, Tajawal, sans-serif",
         width: isLandscape ? `${sidebarWidth}px` : undefined,
       }}
     >
-      <div className="p-3 sm:p-4 landscape:p-2 border-b border-gray-100 bg-white">
-        <h1 className="text-xl landscape:text-base font-extrabold text-gray-900 mb-3 landscape:mb-2 tracking-tight">
+      <div className="p-3 sm:p-4 landscape:p-2 border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <h1 className="text-xl landscape:text-base font-extrabold text-gray-900 dark:text-white mb-3 landscape:mb-2 tracking-tight">
           لوحة التحكم
         </h1>
         <div className="mb-3 flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800">
             إجمالي: {visitors.length}
           </span>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 border border-rose-100">
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800">
             غير مقروء: {unreadCount}
           </span>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-600 border border-amber-100">
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800">
             قيد المراجعة: {waitingCount}
           </span>
         </div>
@@ -219,7 +219,7 @@ export function VisitorSidebar({
             placeholder="بحث (الاسم، الهوية، الهاتف، آخر 4 أرقام)"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50/80 py-2.5 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 focus:bg-white landscape:py-1.5 landscape:text-xs transition-all duration-200 placeholder:text-gray-400"
+            className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/80 dark:bg-slate-800/80 py-2.5 pl-4 pr-10 text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 focus:bg-white dark:focus:bg-slate-800 landscape:py-1.5 landscape:text-xs transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-slate-500"
           />
         </div>
 
@@ -229,7 +229,7 @@ export function VisitorSidebar({
             className={`px-3 py-2 landscape:py-1 rounded-xl text-sm landscape:text-xs font-semibold transition-all duration-200 ${
               cardFilter === "all"
                 ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm shadow-emerald-200"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700"
             }`}
           >
             الكل
@@ -239,7 +239,7 @@ export function VisitorSidebar({
             className={`px-3 py-2 landscape:py-1 rounded-xl text-sm landscape:text-xs font-semibold transition-all duration-200 ${
               cardFilter === "hasCard"
                 ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm shadow-emerald-200"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700"
             }`}
           >
             لديهم بطاقة
@@ -249,7 +249,7 @@ export function VisitorSidebar({
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={onSelectAll}
-            className="flex min-w-[135px] flex-1 items-center justify-center gap-2 rounded-xl bg-gray-100 px-3 py-2 text-sm font-semibold transition-all duration-200 hover:bg-gray-200 text-gray-700 landscape:py-1 landscape:text-xs"
+            className="flex min-w-[135px] flex-1 items-center justify-center gap-2 rounded-xl bg-gray-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold transition-all duration-200 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 landscape:py-1 landscape:text-xs"
           >
             {allSelected ? (
               <CheckSquare className="w-4 h-4 landscape:w-3 landscape:h-3" />
@@ -273,10 +273,10 @@ export function VisitorSidebar({
 
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         {visitors.length === 0 ? (
-          <div className="p-8 text-center text-gray-400 space-y-3">
+          <div className="p-8 text-center text-gray-400 dark:text-slate-500 space-y-3">
             <p className="text-4xl opacity-50">📭</p>
-            <p className="font-semibold text-gray-500">لا يوجد زوار</p>
-            <p className="text-xs text-gray-400">
+            <p className="font-semibold text-gray-500 dark:text-slate-400">لا يوجد زوار</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500">
               سيظهر الزوار هنا عند بدء التفاعل
             </p>
           </div>
@@ -289,14 +289,14 @@ export function VisitorSidebar({
               <div
                 key={visitor.id}
                 onClick={() => onSelectVisitor(visitor)}
-                className={`border-b border-gray-100/80 p-3 sm:p-4 landscape:p-2 cursor-pointer transition-all duration-200 ${
+                className={`border-b border-gray-100/80 dark:border-slate-800/80 p-3 sm:p-4 landscape:p-2 cursor-pointer transition-all duration-200 ${
                   isSelected
-                    ? "bg-gradient-to-l from-emerald-50/80 to-white border-r-[3px] border-r-emerald-500"
+                    ? "bg-gradient-to-l from-emerald-50/80 to-white dark:from-emerald-950/40 dark:to-slate-900 border-r-[3px] border-r-emerald-500"
                     : visitor.isBlocked
-                    ? "bg-red-50/50 border-r-[3px] border-r-red-400"
+                    ? "bg-red-50/50 dark:bg-red-950/30 border-r-[3px] border-r-red-400"
                     : visitor.isUnread
-                    ? "bg-blue-50/40 hover:bg-blue-50/60"
-                    : "hover:bg-gray-50/80"
+                    ? "bg-blue-50/40 dark:bg-blue-950/30 hover:bg-blue-50/60 dark:hover:bg-blue-950/50"
+                    : "hover:bg-gray-50/80 dark:hover:bg-slate-800/60"
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -317,7 +317,7 @@ export function VisitorSidebar({
                   <div className="flex-1 min-w-0">
                     <div className="mb-1 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                        <h3 className="font-bold text-gray-900 truncate text-base landscape:text-sm">
+                        <h3 className="font-bold text-gray-900 dark:text-white truncate text-base landscape:text-sm">
                           {getVisitorDisplayName(visitor)}
                         </h3>
                         {visitor.isBlocked && (
@@ -349,14 +349,14 @@ export function VisitorSidebar({
                       </div>
 
                       <div className="flex items-center gap-2 whitespace-nowrap sm:self-auto">
-                        <span className="text-[11px] landscape:text-[10px] text-gray-400 font-medium">
+                        <span className="text-[11px] landscape:text-[10px] text-gray-400 dark:text-slate-500 font-medium">
                           {getTimeAgo(visitor.updatedAt || visitor.lastSeen)}
                         </span>
                         <BlockButton visitor={visitor} />
                       </div>
                     </div>
 
-                    <div className="hidden sm:flex items-center gap-3 mb-2 text-xs text-gray-600">
+                    <div className="hidden sm:flex items-center gap-3 mb-2 text-xs text-gray-600 dark:text-slate-400">
                       {visitor.phoneNumber && (
                         <div className="flex items-center gap-1">
                           <span className="font-medium">
@@ -383,7 +383,7 @@ export function VisitorSidebar({
                                 : "bg-gray-300"
                             }`}
                           ></div>
-                          <span className={`text-xs ${visitor.isOnline ? "text-emerald-600 font-medium" : "text-gray-400"}`}>
+                          <span className={`text-xs ${visitor.isOnline ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-gray-400 dark:text-slate-500"}`}>
                             {visitor.isOnline ? "متصل" : "غير متصل"}
                           </span>
                         </div>

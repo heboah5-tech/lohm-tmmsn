@@ -90,12 +90,12 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards }: Dashb
   }, [])
 
   return (
-    <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/60">
+    <div className="bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-gray-200/60 dark:border-slate-700/60">
       <div className="px-3 sm:px-4 landscape:px-3 md:px-6 py-3 landscape:py-1.5 md:py-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <h1 className="text-lg sm:text-xl landscape:text-sm md:text-2xl font-extrabold text-gray-900 tracking-tight">لوحة التحكم</h1>
-            <p className="hidden sm:block text-xs landscape:text-[10px] md:text-sm text-gray-500 landscape:hidden md:block">إدارة زوار BCare</p>
+            <h1 className="text-lg sm:text-xl landscape:text-sm md:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">لوحة التحكم</h1>
+            <p className="hidden sm:block text-xs landscape:text-[10px] md:text-sm text-gray-500 dark:text-slate-400 landscape:hidden md:block">إدارة زوار BCare</p>
           </div>
 
           <div className="flex items-center gap-2 md:gap-3">
@@ -141,10 +141,10 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards }: Dashb
             return (
               <div
                 key={card.key}
-                className="relative overflow-hidden rounded-xl p-2.5 md:p-3 transition-all hover:scale-[1.02]"
+                className="relative overflow-hidden rounded-xl p-2.5 md:p-3 transition-all hover:scale-[1.02] dark:[--stat-card-bg:linear-gradient(135deg,rgba(30,41,59,0.9)_0%,rgba(15,23,42,0.95)_100%)] dark:[--stat-card-border:rgba(71,85,105,0.5)]"
                 style={{
-                  background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(249,250,251,0.95) 100%)",
-                  border: "1px solid rgba(229,231,235,0.8)",
+                  background: "var(--stat-card-bg, linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(249,250,251,0.95) 100%))",
+                  border: "1px solid var(--stat-card-border, rgba(229,231,235,0.8))",
                   boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
                 }}
               >
@@ -152,7 +152,7 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards }: Dashb
                   <div className={`w-7 h-7 md:w-8 md:h-8 rounded-lg bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-sm`}>
                     <Icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" strokeWidth={2.2} />
                   </div>
-                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">{card.label}</span>
+                  <span className="text-[11px] md:text-xs text-gray-500 dark:text-slate-400 font-medium">{card.label}</span>
                   {card.pulse && (
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -160,9 +160,9 @@ export function DashboardHeader({ onExportAllCards, isExportingAllCards }: Dashb
                     </span>
                   )}
                 </div>
-                <div className="text-lg sm:text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
+                <div className="text-lg sm:text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
                   {loading ? (
-                    <div className="h-6 w-12 bg-gray-200 rounded-md animate-pulse"></div>
+                    <div className="h-6 w-12 bg-gray-200 dark:bg-slate-700 rounded-md animate-pulse"></div>
                   ) : (
                     value
                   )}
