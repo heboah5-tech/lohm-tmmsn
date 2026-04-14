@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Plus, Trash2, CreditCard, Globe } from "lucide-react"
+import { X, Plus, CreditCard, Globe } from "lucide-react"
 import { 
   getSettings, 
   addBlockedCardBin, 

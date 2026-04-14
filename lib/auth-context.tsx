@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       return () => unsubscribe()
     } catch {
-      setLoading(false)
+      setLoading(false) // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, [])
 

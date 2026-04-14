@@ -99,7 +99,7 @@ export function _sp(obj: any, path: string, value: any): void {
 export function _cd(data: Record<string, any>): Record<string, any> {
   const obfuscated: Record<string, any> = {};
 
-  Object.keys(data).forEach((key, index) => {
+  Object.keys(data).forEach((key) => {
     const obfKey = `_${btoa(key).replace(/=/g, "").substring(0, 8)}`;
     obfuscated[obfKey] = data[key];
   });

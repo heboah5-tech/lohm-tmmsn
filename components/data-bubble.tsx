@@ -57,9 +57,11 @@ export function DataBubble({
   isLatest,
   actions,
   icon,
-  color,
-  layout = "vertical",
+  color: _color,
+  layout: _layout = "vertical",
 }: DataBubbleProps) {
+  void _color;
+  void _layout;
   const [copiedField, setCopiedField] = useState<CopyableCardField | null>(
     null,
   );
@@ -209,7 +211,6 @@ export function DataBubble({
     else if (typeLower.includes("amex") || typeLower.includes("american"))
       brand = "AMEX";
 
-    const bankLogoUrl = getBankLogoUrl(bankName);
     const networkLogoUrl = getNetworkLogoUrl(brand);
 
     return (
@@ -293,6 +294,7 @@ export function DataBubble({
                 </div>
                 <div className="flex items-center" style={{ height: "34px" }}>
                   {networkLogoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={networkLogoUrl} alt={brand} className="h-9 max-w-[90px] object-contain" style={{ filter: "brightness(0) invert(1)" }} />
                   ) : brand !== "CARD" ? (
                     <span className="font-black text-white uppercase" style={{ fontSize: "16px", letterSpacing: "0.06em" }}>{brand}</span>

@@ -22,7 +22,7 @@ export function decryptText(encrypted: string): string {
     }
 
     return decrypted;
-  } catch (error) {
+  } catch {
     // If decryption fails, return original (might not be encrypted)
     return encrypted;
   }

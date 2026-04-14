@@ -177,8 +177,9 @@ export function VisitorSidebar({
   onSelectAll,
   onDeleteSelected,
   sidebarWidth,
-  onSidebarWidthChange,
+  onSidebarWidthChange: _onSidebarWidthChange,
 }: VisitorSidebarProps) {
+  void _onSidebarWidthChange;
   const allSelected =
     visitors.length > 0 && selectedIds.size === visitors.length;
   const isLandscape =
