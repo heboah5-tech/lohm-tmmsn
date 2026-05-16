@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
-import { Settings, Activity, Users, UserCheck, CreditCard, Smartphone } from "lucide-react"
+import { Settings, Activity, Users, UserCheck, CreditCard, Smartphone, LogOut } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
 
 interface AnalyticsData {
   activeUsers: number
@@ -34,6 +35,7 @@ export function DashboardHeader() {
   })
   const [loading, setLoading] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+  const { logout, user } = useAuth()
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -84,12 +86,24 @@ export function DashboardHeader() {
             })}
           </div>
 
+          {user?.email && (
+            <span className="hidden md:inline text-[11px] text-gray-500 dark:text-slate-400 truncate max-w-[160px]" title={user.email}>
+              {user.email}
+            </span>
+          )}
           <button
             onClick={() => setShowSettings(true)}
             className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white p-2 rounded-xl transition-all shadow-sm hover:shadow-md shrink-0"
             title="إعدادات"
           >
             <Settings className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => logout()}
+            className="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white p-2 rounded-xl transition-all shadow-sm hover:shadow-md shrink-0"
+            title="تسجيل الخروج"
+          >
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>
