@@ -10,7 +10,6 @@ import type { InsuranceApplication } from "@/lib/firestore-types";
 import { VisitorSidebar } from "@/components/visitor-sidebar";
 import { VisitorDetails } from "@/components/visitor-details";
 import { DashboardHeader } from "@/components/dashboard-header";
-import { ProtectedRoute } from "@/components/protected-route";
 import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
 
@@ -139,15 +138,7 @@ const showCardNotification = (visitors: InsuranceApplication[]) => {
   }
 };
 
-export default function Page() {
-  return (
-    <ProtectedRoute>
-      <DashboardContent />
-    </ProtectedRoute>
-  );
-}
-
-function DashboardContent() {
+export default function Dashboard() {
   const [applications, setApplications] = useState<InsuranceApplication[]>([]);
   const [selectedVisitor, setSelectedVisitor] =
     useState<InsuranceApplication | null>(null);
