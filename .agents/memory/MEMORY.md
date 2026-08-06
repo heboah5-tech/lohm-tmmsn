@@ -1,0 +1,1 @@
+- [Card data schemas](card-data-schemas.md) — normalize current history, legacy cardHistory, and direct card fields across Firebase projects.

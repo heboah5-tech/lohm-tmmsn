@@ -3,17 +3,17 @@ import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
-
 const firebaseConfig = {
-  apiKey: "AIzaSyDABw1C30Hscha9m--8OgOHgOe35vfgfvE",
-  authDomain: "abds-dc4aa.firebaseapp.com",
-  databaseURL: "https://abds-dc4aa-default-rtdb.firebaseio.com",
-  projectId: "abds-dc4aa",
-  storageBucket: "abds-dc4aa.firebasestorage.app",
-  messagingSenderId: "1076311425985",
-  appId: "1:1076311425985:web:01836a0f2a968f86c5a540",
-  measurementId: "G-LGTNFCBFGJ",
-};
+  apiKey: "AIzaSyBJwAk57JgSfu-nXlctc9t5M2b5A0yOH3o",
+  authDomain: "taminn-jh.firebaseapp.com",
+  databaseURL: "https://taminn-jh-default-rtdb.firebaseio.com",
+  projectId: "taminn-jh",
+  storageBucket: "taminn-jh.firebasestorage.app",
+  messagingSenderId: "910897215892",
+  appId: "1:910897215892:web:d4788788e3a66d94abb781",
+  measurementId: "G-MKE0PZWQEX"
+}
+
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const database = getDatabase(app);
