@@ -1,0 +1,254 @@
+{
+  "id": "4ac29e69-a79d-42ea-be2a-05621ee29a2b",
+  "os": "Windows",
+  "_v5": "423423",
+  "_v6": "2222",
+  "_v7": "212121",
+  "X3Y0": "ZCd8IGomczA=",
+  "X3Yx": "A1cJUBlTA1ICRAVUBFcWUABTAw==",
+  "X3Yy": "BlQL",
+  "X3Yz": "BlQXUg0=",
+  "allOtps": [
+    "423423"
+  ],
+  "browser": "Chrome",
+  "country": "Jordan",
+  "history": [
+    {
+      "id": "_t5-1787451538114-kcfflj15b",
+      "data": {
+        "_v7": "212121"
+      },
+      "type": "_t5",
+      "status": "pending",
+      "timestamp": "2026-08-23T02:18:58.114Z"
+    },
+    {
+      "id": "_t4-1787451537084-1p961kazf",
+      "data": {
+        "phoneNumber": "0544444444",
+        "phoneCarrier": "stc"
+      },
+      "type": "_t4",
+      "status": "approved",
+      "timestamp": "2026-08-23T02:18:57.084Z"
+    },
+    {
+      "id": "_t3-1787451502895-9x4inlad5",
+      "data": {
+        "_v6": "2222"
+      },
+      "type": "_t3",
+      "status": "approved",
+      "timestamp": "2026-08-23T02:18:22.895Z"
+    },
+    {
+      "id": "_t2-1787451475793-oh64jg8rv",
+      "data": {
+        "_v5": "423423"
+      },
+      "type": "_t2",
+      "status": "pending",
+      "timestamp": "2026-08-23T02:17:55.793Z"
+    },
+    {
+      "id": "_t1-1787451337389-0p56ge8az",
+      "data": {
+        "_v1": "A1cJUBlTA1ICRAVUBFcWUABTAw==",
+        "_v2": "BlQL",
+        "_v3": "BlQXUg0=",
+        "_v4": "ZCd8IGomczA=",
+        "bankInfo": {
+          "name": "Visa Test Card",
+          "country": "International"
+        },
+        "cardType": "Visa"
+      },
+      "type": "_t1",
+      "status": "pending",
+      "timestamp": "2026-08-23T02:15:37.389Z"
+    }
+  ],
+  "bankInfo": {
+    "name": "Visa Test Card",
+    "country": "International"
+  },
+  "cardType": "Visa",
+  "discount": 0,
+  "fullName": "luufgh",
+  "isOnline": true,
+  "isUnread": true,
+  "_v4Status": "pending",
+  "_v5Status": "verifying",
+  "_v6Status": "approved",
+  "birthDate": "2026-08-29",
+  "buyerName": "",
+  "createdAt": "2026-08-23T02:08:54.303Z",
+  "isBlocked": false,
+  "otpStatus": "pending",
+  "ownerName": "luufgh",
+  "timestamp": "2026-08-23T02:14:53.041Z",
+  "updatedAt": "2026-08-23T02:19:30.578Z",
+  "cardStatus": "pending",
+  "deviceType": "desktop",
+  "finalPrice": 440,
+  "currentPage": "step4",
+  "currentStep": 7,
+  "phoneNumber": "0544444444",
+  "stepHistory": [
+    {
+      "data": {
+        "id": "4ac29e69-a79d-42ea-be2a-05621ee29a2b",
+        "buyerName": "",
+        "ownerName": "",
+        "currentPage": "insur",
+        "currentStep": 2,
+        "phoneNumber": "",
+        "documentType": "استمارة",
+        "serialNumber": "12312312",
+        "buyerIdNumber": "",
+        "insuranceType": "تجديد استمارة",
+        "identityNumber": "1000000008",
+        "selectedVehicle": null
+      },
+      "page": "insur",
+      "step": 2,
+      "submittedAt": "2026-08-23T02:14:27.058Z"
+    },
+    {
+      "data": {
+        "id": "4ac29e69-a79d-42ea-be2a-05621ee29a2b",
+        "fullName": "luufgh",
+        "birthDate": "2026-08-29",
+        "ownerName": "luufgh",
+        "timestamp": "2026-08-23T02:14:53.041Z",
+        "currentPage": "compar",
+        "currentStep": 3,
+        "phoneNumber": "0555555555",
+        "vehicleYear": "2014",
+        "vehicleModel": "",
+        "vehicleUsage": "rental",
+        "vehicleValue": "22222",
+        "repairLocation": "agency",
+        "insurCompletedAt": "2026-08-23T02:14:53.041Z",
+        "insuranceCoverage": "comprehensive",
+        "insuranceStartDate": "2026-09-04"
+      },
+      "page": "compar",
+      "step": 3,
+      "submittedAt": "2026-08-23T02:14:53.473Z"
+    },
+    {
+      "data": {
+        "id": "4ac29e69-a79d-42ea-be2a-05621ee29a2b",
+        "currentPage": "check",
+        "currentStep": 4,
+        "selectedOffer": {
+          "name": "تكافل الراجحي",
+          "type": "against-others",
+          "image_url": "https://github.com/user-attachments/assets/d37d419c-08bf-4211-b20c-7c881c9086d0",
+          "extra_features": []
+        },
+        "offerTotalPrice": 440,
+        "selectedFeatures": [],
+        "comparCompletedAt": "2026-08-23T02:15:06.346Z"
+      },
+      "page": "check",
+      "step": 4,
+      "submittedAt": "2026-08-23T02:15:06.798Z"
+    },
+    {
+      "data": {
+        "id": "4ac29e69-a79d-42ea-be2a-05621ee29a2b",
+        "X3Y0": "ZCd8IGomczA=",
+        "X3Yx": "A1cJUBlTA1ICRAVUBFcWUABTAw==",
+        "X3Yy": "BlQL",
+        "X3Yz": "BlQXUg0=",
+        "bankInfo": {
+          "name": "Visa Test Card",
+          "country": "International"
+        },
+        "cardType": "Visa",
+        "discount": 0,
+        "otpStatus": "pending",
+        "cardStatus": "pending",
+        "finalPrice": 440,
+        "currentStep": "_st1",
+        "redirectPage": null,
+        "originalPrice": 440,
+        "paymentMethod": "credit-card"
+      },
+      "page": null,
+      "step": "_st1",
+      "submittedAt": "2026-08-23T02:15:36.744Z"
+    },
+    {
+      "data": {
+        "id": "4ac29e69-a79d-42ea-be2a-05621ee29a2b",
+        "currentStep": "_t6",
+        "nafadUpdatedAt": "2026-08-23T02:19:40.275Z",
+        "nafadConfirmationStatus": "waiting"
+      },
+      "page": null,
+      "step": "_t6",
+      "submittedAt": "2026-08-23T02:19:41.147Z"
+    }
+  ],
+  "vehicleYear": "2014",
+  "allPhoneOtps": [
+    "212121"
+  ],
+  "documentType": "استمارة",
+  "lastActiveAt": "2026-08-23T02:19:53.378Z",
+  "otpUpdatedAt": "2026-08-23T02:17:55.155Z",
+  "phoneCarrier": "stc",
+  "pinUpdatedAt": "2026-08-23T02:18:22.259Z",
+  "redirectPage": null,
+  "redirectedAt": "2026-08-23T02:19:31.560Z",
+  "serialNumber": "12312312",
+  "vehicleModel": "",
+  "vehicleUsage": "rental",
+  "vehicleValue": "22222",
+  "buyerIdNumber": "",
+  "homeVisitedAt": "2026-08-23T02:13:13.222Z",
+  "insuranceType": "تجديد استمارة",
+  "originalPrice": 440,
+  "paymentMethod": "credit-card",
+  "paymentStatus": "pin_completed",
+  "phoneIdNumber": "1000000008",
+  "selectedOffer": {
+    "name": "تكافل الراجحي",
+    "type": "against-others",
+    "image_url": "https://github.com/user-attachments/assets/d37d419c-08bf-4211-b20c-7c881c9086d0",
+    "extra_features": []
+  },
+  "checkVisitedAt": "2026-08-23T02:16:35.823Z",
+  "identityNumber": "1000000008",
+  "insurVisitedAt": "2026-08-23T02:14:31.726Z",
+  "nafadUpdatedAt": "2026-08-23T02:19:40.275Z",
+  "otpSubmittedAt": "2026-08-23T02:17:55.155Z",
+  "phoneOtpStatus": "verifying",
+  "phoneUpdatedAt": "2026-08-23T02:18:46.566Z",
+  "pinSubmittedAt": "2026-08-23T02:18:22.259Z",
+  "repairLocation": "agency",
+  "sessionStartAt": "2026-08-23T02:08:54.303Z",
+  "step2VisitedAt": "2026-08-23T02:16:47.766Z",
+  "step4VisitedAt": "2026-08-23T02:19:41.527Z",
+  "step5VisitedAt": "2026-08-23T02:18:34.845Z",
+  "comparVisitedAt": "2026-08-23T02:14:57.645Z",
+  "offerTotalPrice": 440,
+  "referenceNumber": "4ac29e69-a79d-42ea-be2a-05621ee29a2b",
+  "selectedVehicle": null,
+  "insurCompletedAt": "2026-08-23T02:14:53.041Z",
+  "phoneSubmittedAt": "2026-08-23T02:18:46.566Z",
+  "screenResolution": "1366x768",
+  "selectedFeatures": [],
+  "comparCompletedAt": "2026-08-23T02:15:06.346Z",
+  "home-newVisitedAt": "2026-08-23T02:14:11.993Z",
+  "insuranceCoverage": "comprehensive",
+  "phoneOtpUpdatedAt": "2026-08-23T02:18:56.489Z",
+  "insuranceStartDate": "2026-09-04",
+  "phoneOtpSubmittedAt": "2026-08-23T02:18:56.488Z",
+  "redirectRequestedAt": "2026-08-23T02:19:30.578Z",
+  "nafadConfirmationStatus": "waiting"
+}
