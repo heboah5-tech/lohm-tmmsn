@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/update-session";
 
 const isProtectedRoute = (request: NextRequest) =>
+  request.nextUrl.pathname === "/" ||
   request.nextUrl.pathname === "/dashboard" ||
   request.nextUrl.pathname.startsWith("/dashboard/");
 

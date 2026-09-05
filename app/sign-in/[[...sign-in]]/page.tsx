@@ -1,21 +1,48 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getBrowserSupabaseClient } from "@/lib/supabase/browser";
 
+function getSafeRedirectUrl() {
+  const redirectUrl = new URLSearchParams(window.location.search).get("redirect_url");
+  return redirectUrl?.startsWith("/") && !redirectUrl.startsWith("//")
+    ? redirectUrl
+    : "/dashboard";
+}
+
 export default function SignInPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    void getBrowserSupabaseClient()
+      .auth.getUser()
+      .then(({ data }) => {
+        if (active && data.user) {
+          router.replace(getSafeRedirectUrl());
+          router.refresh();
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [router]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setLoading(true);
 
-    const { error: signInError } = await getBrowserSupabaseClient().auth.signInWithPassword({
+    const supabase = getBrowserSupabaseClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
@@ -26,9 +53,18 @@ export default function SignInPage() {
       return;
     }
 
-    const redirectUrl =
-      new URLSearchParams(window.location.search).get("redirect_url") || "/dashboard";
-    window.location.assign(redirectUrl.startsWith("/") ? redirectUrl : "/dashboard");
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      setError("تم تسجيل الدخول لكن لم يتم تثبيت الجلسة. أعد المحاولة.");
+      setLoading(false);
+      return;
+    }
+
+    router.replace(getSafeRedirectUrl());
+    router.refresh();
   };
 
   return (
