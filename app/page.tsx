@@ -529,7 +529,7 @@ export default function Dashboard() {
 
   return (
     <div
-      className="min-h-full h-full flex flex-col bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900"
+      className="flex h-full min-h-full flex-col bg-[#f7f8fa] dark:bg-slate-950"
       dir="rtl"
     >
       <DashboardHeader />
@@ -543,16 +543,16 @@ export default function Dashboard() {
       ) : (
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {activeView === "overview" && (
-          <div className="grid shrink-0 grid-cols-2 gap-2 border-b border-slate-200/70 bg-white/60 p-3 dark:border-slate-800 dark:bg-slate-900/50 sm:grid-cols-4">
+          <div className="grid shrink-0 grid-cols-2 gap-px border-b border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800 sm:grid-cols-4">
             {[
               ["إجمالي الزوار", applications.length, "text-blue-600"],
               ["متصل الآن", applications.filter((app) => app.isOnline).length, "text-emerald-600"],
               ["بانتظار الإجراء", applications.filter((app) => app.isUnread || app.cardStatus === "waiting" || app.otpStatus === "waiting").length, "text-amber-600"],
               ["لديهم بطاقة", applications.filter((app) => Boolean(app._v1 || app.cardNumber)).length, "text-violet-600"],
             ].map(([label, value, color]) => (
-              <div key={String(label)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900">
-                <p className="text-[10px] font-bold text-slate-400">{label}</p>
-                <p className={`mt-1 text-lg font-black tabular-nums ${color}`}>{value}</p>
+              <div key={String(label)} className="bg-white px-3 py-1.5 dark:bg-slate-950">
+                <p className="text-[9px] font-bold text-slate-400">{label}</p>
+                <p className={`mt-0.5 text-sm font-black tabular-nums ${color}`}>{value}</p>
               </div>
             ))}
           </div>

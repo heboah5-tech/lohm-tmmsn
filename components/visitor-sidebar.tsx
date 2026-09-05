@@ -196,41 +196,41 @@ export function VisitorSidebar({
 
   return (
     <div
-      className="h-full w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md landscape:border-l md:w-[400px] md:border-l border-gray-200/60 dark:border-slate-700/60 flex flex-col relative group"
+      className="relative flex h-full w-full flex-col border-gray-200/80 bg-white dark:bg-slate-950 landscape:border-l md:w-[310px] md:border-l dark:border-slate-800"
       style={{
         fontFamily: "Cairo, Tajawal, sans-serif",
         width: isLandscape ? `${sidebarWidth}px` : undefined,
       }}
     >
-      <div className="p-3 sm:p-4 landscape:p-2 border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div className="relative mb-3 landscape:mb-2">
+       <div className="border-b border-gray-100 bg-white p-2 dark:border-slate-800 dark:bg-slate-950 landscape:p-1.5">
+         <div className="relative mb-2 landscape:mb-1.5">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 landscape:w-3.5 landscape:h-3.5 text-gray-400" />
           <input
             type="text"
             placeholder="بحث (الاسم، الهوية، الهاتف، آخر 4 أرقام)"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/80 dark:bg-slate-800/80 py-2.5 pl-4 pr-10 text-sm dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 focus:bg-white dark:focus:bg-slate-800 landscape:py-1.5 landscape:text-xs transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-slate-500"
+             className="w-full rounded-md border border-gray-200 bg-[#f7f8fa] py-2 pl-3 pr-8 text-xs text-slate-700 transition-all placeholder:text-slate-400 focus:border-[#0b72ce] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0b72ce]/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 landscape:py-1.5 landscape:text-[11px]"
           />
         </div>
 
-        <div className="mb-3 grid grid-cols-2 gap-1.5 landscape:mb-2">
+         <div className="mb-2 grid grid-cols-2 gap-1 landscape:mb-1.5">
           <button
             onClick={() => onCardFilterChange("all")}
-            className={`px-3 py-2 landscape:py-1 rounded-xl text-sm landscape:text-xs font-semibold transition-all duration-200 ${
+             className={`rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 landscape:py-1 landscape:text-[10px] ${
               cardFilter === "all"
-                ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm shadow-emerald-200"
-                : "bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700"
+                 ? "bg-[#0b72ce] text-white shadow-sm shadow-blue-200"
+                 : "bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-300"
             }`}
           >
             الكل
           </button>
           <button
             onClick={() => onCardFilterChange("hasCard")}
-            className={`px-3 py-2 landscape:py-1 rounded-xl text-sm landscape:text-xs font-semibold transition-all duration-200 ${
+             className={`rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 landscape:py-1 landscape:text-[10px] ${
               cardFilter === "hasCard"
-                ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm shadow-emerald-200"
-                : "bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700"
+                 ? "bg-[#0b72ce] text-white shadow-sm shadow-blue-200"
+                 : "bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-300"
             }`}
           >
             لديهم بطاقة
@@ -240,7 +240,7 @@ export function VisitorSidebar({
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={onSelectAll}
-            className="flex min-w-[135px] flex-1 items-center justify-center gap-2 rounded-xl bg-gray-100 dark:bg-slate-800 px-3 py-2 text-sm font-semibold transition-all duration-200 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 landscape:py-1 landscape:text-xs"
+             className="flex min-w-[110px] flex-1 items-center justify-center gap-1.5 rounded-md bg-slate-100 px-2 py-1.5 text-[11px] font-semibold text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-300 landscape:py-1 landscape:text-[10px]"
           >
             {allSelected ? (
               <CheckSquare className="w-4 h-4 landscape:w-3 landscape:h-3" />
@@ -253,7 +253,7 @@ export function VisitorSidebar({
           {selectedIds.size > 0 && (
             <button
               onClick={onDeleteSelected}
-              className="flex min-w-[135px] flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-3 py-2 text-sm font-semibold text-white transition-all duration-200 hover:from-red-600 hover:to-red-700 shadow-sm shadow-red-200 landscape:py-1 landscape:text-xs"
+               className="flex min-w-[110px] flex-1 items-center justify-center gap-1.5 rounded-md bg-red-500 px-2 py-1.5 text-[11px] font-semibold text-white transition-all hover:bg-red-600 landscape:py-1 landscape:text-[10px]"
             >
               <Trash2 className="w-4 h-4 landscape:w-3 landscape:h-3" />
               حذف ({selectedIds.size})
@@ -280,9 +280,9 @@ export function VisitorSidebar({
               <div
                 key={visitor.id}
                 onClick={() => onSelectVisitor(visitor)}
-                className={`border-b border-gray-100/80 dark:border-slate-800/80 p-3 sm:p-4 landscape:p-2 cursor-pointer transition-all duration-200 ${
+                className={`cursor-pointer border-b border-gray-100/80 p-2 transition-all duration-200 dark:border-slate-800/80 landscape:p-1.5 ${
                   isSelected
-                    ? "bg-gradient-to-l from-emerald-50/80 to-white dark:from-emerald-950/40 dark:to-slate-900 border-r-[3px] border-r-emerald-500"
+                    ? "border-r-2 border-r-[#0b72ce] bg-blue-50/60 dark:bg-blue-950/30"
                     : visitor.isBlocked
                     ? "bg-red-50/50 dark:bg-red-950/30 border-r-[3px] border-r-red-400"
                     : visitor.isUnread
@@ -308,7 +308,7 @@ export function VisitorSidebar({
                   <div className="flex-1 min-w-0">
                     <div className="mb-1 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                        <h3 className="font-bold text-gray-900 dark:text-white truncate text-base landscape:text-sm">
+                        <h3 className="truncate text-xs font-bold text-gray-900 dark:text-white landscape:text-[11px]">
                           {getVisitorDisplayName(visitor)}
                         </h3>
                         {visitor.isBlocked && (
@@ -317,14 +317,14 @@ export function VisitorSidebar({
                             محظور
                           </span>
                         )}
-                        <span className="flex items-center gap-1 rounded-lg bg-teal-500 px-2 py-0.5 text-[11px] font-medium text-white whitespace-nowrap shadow-sm">
+                           <span className="flex items-center gap-1 rounded-md bg-[#0b72ce] px-1.5 py-0.5 text-[9px] font-medium text-white whitespace-nowrap shadow-sm">
                           {isWaitingForAdmin(visitor) && (
                             <RefreshCw className="w-3 h-3 animate-spin" />
                           )}
                           {getPageName(getVisitorCurrentPage(visitor))}
                         </span>
                         {hasCard && (
-                          <span className="flex items-center gap-1 rounded-lg border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-600 whitespace-nowrap">
+                           <span className="flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-1.5 py-0.5 text-[9px] font-semibold text-blue-600 whitespace-nowrap">
                             <CreditCard className="w-3 h-3" />
                             بطاقة
                           </span>
