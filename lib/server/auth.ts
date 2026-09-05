@@ -1,6 +1,6 @@
 import "server-only";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { getAuthSupabaseClient } from "@/lib/supabase/server";
 
 export class AuthorizationError extends Error {
   constructor(
@@ -13,31 +13,31 @@ export class AuthorizationError extends Error {
 }
 
 export async function requireAdmin() {
-  const { userId } = await auth();
-  if (!userId) {
+  const supabase = await getAuthSupabaseClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
     throw new AuthorizationError(401, "Authentication required");
   }
 
-  const user = await currentUser();
-  const metadata = (user?.publicMetadata || {}) as Record<string, unknown>;
-  const privateMetadata = (user?.privateMetadata || {}) as Record<string, unknown>;
-  const email = user?.emailAddresses.find(
-    (address) => address.id === user.primaryEmailAddressId,
-  )?.emailAddress;
+  const appMetadata = (user.app_metadata || {}) as Record<string, unknown>;
+  const email = user.email;
   const allowedEmails = (process.env.ADMIN_EMAILS || "")
     .split(",")
     .map((value) => value.trim().toLowerCase())
     .filter(Boolean);
-  const allowedUserIds = (process.env.ADMIN_CLERK_USER_IDS || "")
+  const allowedUserIds = (process.env.ADMIN_SUPABASE_USER_IDS || "")
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
 
   const isAdmin =
-    metadata.role === "admin" ||
-    metadata.isAdmin === true ||
-    privateMetadata.role === "admin" ||
-    allowedUserIds.includes(userId) ||
+    appMetadata.role === "admin" ||
+    appMetadata.isAdmin === true ||
+    allowedUserIds.includes(user.id) ||
     (!!email && allowedEmails.includes(email.toLowerCase()));
 
   if (!isAdmin) {
@@ -45,9 +45,13 @@ export async function requireAdmin() {
   }
 
   return {
-    userId,
+    userId: user.id,
     name:
-      [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+      (typeof user.user_metadata?.full_name === "string"
+        ? user.user_metadata.full_name
+        : typeof user.user_metadata?.name === "string"
+          ? user.user_metadata.name
+          : undefined) ||
       email ||
       "Administrator",
     email,

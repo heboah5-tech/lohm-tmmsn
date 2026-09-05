@@ -1,21 +1,29 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { updateSession } from "@/lib/supabase/update-session";
 
-const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)",
-]);
+const isProtectedRoute = (request: NextRequest) =>
+  request.nextUrl.pathname === "/dashboard" ||
+  request.nextUrl.pathname.startsWith("/dashboard/");
 
-export default clerkMiddleware(
-  async (auth, request) => {
-    if (isProtectedRoute(request)) {
-      await auth.protect();
-    }
-  },
-  {
-    publishableKey:
-      process.env.CLERK_PUBLISHABLE_KEY ||
-      process.env.VITE_CLERK_PUBLISHABLE_KEY,
-  },
-);
+export default async function middleware(request: NextRequest) {
+  const { response, user } = await updateSession(request);
+
+  if (isProtectedRoute(request) && !user) {
+    const signInUrl = request.nextUrl.clone();
+    signInUrl.pathname = "/sign-in";
+    signInUrl.search = "";
+    signInUrl.searchParams.set(
+      "redirect_url",
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    );
+
+    const redirectResponse = NextResponse.redirect(signInUrl);
+    response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie));
+    return redirectResponse;
+  }
+
+  return response;
+}
 
 export const config = {
   matcher: [

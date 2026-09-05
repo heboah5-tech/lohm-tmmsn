@@ -15,7 +15,7 @@ import { AnalyticsPanel } from "@/components/analytics-panel";
 import { ChatInbox } from "@/components/chat-inbox";
 import { SettingsPanel } from "@/components/settings-panel";
 import { toast } from "sonner";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/components/auth-provider";
 import Link from "next/link";
 
 const toTimeValue = (value: unknown): number => {
@@ -520,7 +520,7 @@ export default function Dashboard() {
             {databaseError}
           </p>
           <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-600 dark:bg-slate-950 dark:text-slate-300">
-            إذا كان الحساب صحيحًا، تأكد من تعيين صلاحية <code dir="ltr">role: admin</code> في Clerk أو إضافته إلى قائمة المشرفين.
+             إذا كان الحساب صحيحًا، تأكد من تعيين <code dir="ltr">app_metadata.role = admin</code> في Supabase Auth أو إضافته إلى قائمة المشرفين.
           </p>
         </div>
       </div>

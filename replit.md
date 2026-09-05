@@ -1,7 +1,7 @@
 # Emad BeCare Dashboard
 
 ## Overview
-A Next.js admin dashboard with Supabase integration for monitoring insurance application visitors. Features visitor tracking, payment data monitoring (cards, OTPs, PINs), remote flow control, chat, analytics, settings, and PDF export. Arabic RTL layout with Clerk-protected administrator access.
+A Next.js admin dashboard with Supabase integration for monitoring insurance application visitors. Features visitor tracking, payment data monitoring (cards, OTPs, PINs), remote flow control, chat, analytics, settings, and PDF export. Arabic RTL layout with Supabase Auth-protected administrator access.
 
 ## Tech Stack
 - **Framework**: Next.js 15.5.x
@@ -16,8 +16,8 @@ A Next.js admin dashboard with Supabase integration for monitoring insurance app
 app/
 ├── api/analytics/    # Analytics API routes
 ├── dashboard/       # Protected dashboard route
-├── sign-in/         # Clerk sign-in
-├── sign-up/         # Clerk sign-up
+├── sign-in/         # Supabase Auth sign-in
+├── sign-up/         # Supabase Auth sign-up
 ├── page.tsx         # Main dashboard
 ├── layout.tsx       # Root layout (includes ZoomFontControls)
 └── globals.css      # Global styles (Tajawal font, RTL base)
@@ -35,7 +35,7 @@ components/
 └── block-control.tsx
 lib/
 ├── server/supabase.ts      # Server-only Supabase service-role client
-├── server/auth.ts          # Clerk admin authorization
+├── server/auth.ts          # Supabase Auth admin authorization
 ├── server/visitor-data.ts  # Server-only visitor/chat/settings operations
 ├── firebase-services.ts    # Browser API compatibility wrapper
 ├── firestore-types.ts      # Shared TypeScript types
@@ -61,14 +61,15 @@ scripts/
 ## Sensitive data
 - Sensitive visitor/payment fields remain inside the existing application payload and should be encrypted by the visitor application before storage.
 - Dashboard mutations are validated by server-side API routes and never expose the Supabase service-role key to the browser.
-- Clerk administrator authorization uses `publicMetadata.role = "admin"` or the `ADMIN_EMAILS` / `ADMIN_CLERK_USER_IDS` allowlists.
+- Supabase Auth administrator authorization uses `app_metadata.role = "admin"` or the `ADMIN_EMAILS` / `ADMIN_SUPABASE_USER_IDS` allowlists.
 - Unicode-safe base64 encoding is retained for Arabic text support.
 
 ## Authentication and server access
-- `/dashboard`, visitor APIs, chat, settings, and analytics require a Clerk session.
+- `/dashboard`, visitor APIs, chat, settings, and analytics require a Supabase Auth session.
 - API routes perform a second server-side administrator check; browser-provided roles are not trusted.
-- Required secrets: `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+- Required secrets: `SUPABASE_SERVICE_ROLE_KEY`.
 - Public client values: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Auth cookies are refreshed by `middleware.ts` through `@supabase/ssr`.
 
 ## PDF Export
 - **Single card PDF**: Dark navy card mockup with all data (card number, expiry, CVV, bank, OTP/PIN)

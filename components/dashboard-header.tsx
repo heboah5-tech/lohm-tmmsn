@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { SettingsModal } from "@/components/settings-modal"
 import { Settings, Activity, Users, UserCheck, CreditCard, Smartphone } from "lucide-react"
-import { useClerk, useUser } from "@clerk/nextjs"
+import { useAuth } from "@/components/auth-provider"
 
 interface AnalyticsData {
   activeUsers: number
@@ -24,8 +24,7 @@ const statItems = [
 ]
 
 export function DashboardHeader() {
-  const { user } = useUser()
-  const { signOut } = useClerk()
+  const { user, signOut } = useAuth()
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     activeUsers: 0,
     todayVisitors: 0,
@@ -90,7 +89,11 @@ export function DashboardHeader() {
           <div className="flex shrink-0 items-center gap-2">
             <div className="hidden text-right sm:block">
               <p className="max-w-[150px] truncate text-[11px] font-bold text-slate-700 dark:text-slate-200">
-                {user?.fullName || user?.primaryEmailAddress?.emailAddress || "المشرف"}
+                 {(typeof user?.user_metadata?.full_name === "string"
+                   ? user.user_metadata.full_name
+                   : typeof user?.user_metadata?.name === "string"
+                     ? user.user_metadata.name
+                     : user?.email) || "المشرف"}
               </p>
               <p className="text-[10px] text-slate-400 dark:text-slate-500">Admin</p>
             </div>
