@@ -52,3 +52,8 @@ build = ["npm", "run", "build"]
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 60000
+
+[userenv]
+
+[userenv.shared]
+ADMIN_EMAILS = "mohmadaki296@gmail.com"
