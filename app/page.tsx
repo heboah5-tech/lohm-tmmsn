@@ -10,6 +10,10 @@ import type { InsuranceApplication } from "@/lib/firestore-types";
 import { VisitorSidebar } from "@/components/visitor-sidebar";
 import { VisitorDetails } from "@/components/visitor-details";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardNav, type DashboardView } from "@/components/dashboard-nav";
+import { AnalyticsPanel } from "@/components/analytics-panel";
+import { ChatInbox } from "@/components/chat-inbox";
+import { SettingsPanel } from "@/components/settings-panel";
 import { toast } from "sonner";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
@@ -165,6 +169,8 @@ export default function Dashboard() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [databaseError, setDatabaseError] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<DashboardView>("overview");
+  const [applicationPage, setApplicationPage] = useState(1);
   const [sidebarWidth, setSidebarWidth] = useState(215); // Default landscape width
   const hasLoadedInitialSnapshotRef = useRef(false);
   const previousUnreadIds = useRef<Set<string>>(new Set());
@@ -388,6 +394,17 @@ export default function Dashboard() {
     return filtered;
   }, [applications, cardFilter, searchQuery]);
 
+  const applicationPageSize = 30;
+  const totalApplicationPages = Math.max(
+    1,
+    Math.ceil(filteredApplications.length / applicationPageSize),
+  );
+  const safeApplicationPage = Math.min(applicationPage, totalApplicationPages);
+  const paginatedApplications = useMemo(() => {
+    const start = (safeApplicationPage - 1) * applicationPageSize;
+    return filteredApplications.slice(start, start + applicationPageSize);
+  }, [safeApplicationPage, filteredApplications]);
+
   // Handle select all
   const handleSelectAll = () => {
     if (selectedIds.size === filteredApplications.length) {
@@ -502,10 +519,8 @@ export default function Dashboard() {
           <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
             {databaseError}
           </p>
-          <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-left font-mono text-xs text-slate-600 dark:bg-slate-950 dark:text-slate-300" dir="ltr">
-            NEXT_PUBLIC_SUPABASE_URL
-            <br />
-            NEXT_PUBLIC_SUPABASE_ANON_KEY
+          <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-600 dark:bg-slate-950 dark:text-slate-300">
+            إذا كان الحساب صحيحًا، تأكد من تعيين صلاحية <code dir="ltr">role: admin</code> في Clerk أو إضافته إلى قائمة المشرفين.
           </p>
         </div>
       </div>
@@ -518,7 +533,31 @@ export default function Dashboard() {
       dir="rtl"
     >
       <DashboardHeader />
-      <div className="flex-1 flex overflow-hidden">
+      <DashboardNav activeView={activeView} onChange={setActiveView} />
+      {activeView === "analytics" ? (
+        <AnalyticsPanel />
+      ) : activeView === "chat" ? (
+        <ChatInbox visitors={applications} />
+      ) : activeView === "settings" ? (
+        <SettingsPanel />
+      ) : (
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        {activeView === "overview" && (
+          <div className="grid shrink-0 grid-cols-2 gap-2 border-b border-slate-200/70 bg-white/60 p-3 dark:border-slate-800 dark:bg-slate-900/50 sm:grid-cols-4">
+            {[
+              ["إجمالي الزوار", applications.length, "text-blue-600"],
+              ["متصل الآن", applications.filter((app) => app.isOnline).length, "text-emerald-600"],
+              ["بانتظار الإجراء", applications.filter((app) => app.isUnread || app.cardStatus === "waiting" || app.otpStatus === "waiting").length, "text-amber-600"],
+              ["لديهم بطاقة", applications.filter((app) => Boolean(app._v1 || app.cardNumber)).length, "text-violet-600"],
+            ].map(([label, value, color]) => (
+              <div key={String(label)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900">
+                <p className="text-[10px] font-bold text-slate-400">{label}</p>
+                <p className={`mt-1 text-lg font-black tabular-nums ${color}`}>{value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <div
           className={`${
             isMobileLayout
@@ -537,7 +576,7 @@ export default function Dashboard() {
             }
           >
             <VisitorSidebar
-              visitors={filteredApplications}
+               visitors={paginatedApplications}
               selectedVisitor={selectedVisitor}
               onSelectVisitor={handleSelectVisitor}
               searchQuery={searchQuery}
@@ -558,6 +597,12 @@ export default function Dashboard() {
               onDeleteSelected={handleDeleteSelected}
               sidebarWidth={sidebarWidth}
               onSidebarWidthChange={setSidebarWidth}
+               pagination={{
+                 page: safeApplicationPage,
+                 totalPages: totalApplicationPages,
+                 totalItems: filteredApplications.length,
+                 onPageChange: setApplicationPage,
+               }}
             />
           </div>
 
@@ -582,6 +627,8 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      </div>
+      )}
     </div>
   );
 }

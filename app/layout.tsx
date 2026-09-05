@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { arSA } from "@clerk/localizations";
 import "./globals.css";
 import { AppToaster } from "@/components/app-toaster";
 import { ZoomFontControls } from "@/components/zoom-font-controls";
@@ -25,7 +26,14 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ClerkProvider publishableKey={process.env.CLERK_PUBLISHABLE_KEY}>
+        <ClerkProvider
+          localization={arSA}
+          publishableKey={
+            process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+            process.env.CLERK_PUBLISHABLE_KEY ||
+            process.env.VITE_CLERK_PUBLISHABLE_KEY
+          }
+        >
           <ClientProviders>
             {children}
             <AppToaster />

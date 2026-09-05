@@ -1,2 +1,4 @@
 - [Card data schemas](card-data-schemas.md) — normalize current history, legacy cardHistory, and direct card fields across Firebase projects.
 - [Supabase visitor mapping](supabase-visitor-mapping.md) — mirror indexed visitor metadata in columns while preserving the complete application payload in data JSONB.
+- [Protected Supabase administration](protected-supabase-administration.md) — keep privileged database access server-only behind Clerk admin checks; RLS blocks anon-key dashboard writes.
+- [Replit Clerk with Next.js](replit-clerk-nextjs.md) — Replit provisions Clerk publishable keys under names Next.js does not automatically consume; bridge them to a public Next env key.

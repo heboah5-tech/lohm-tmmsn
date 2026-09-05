@@ -1,7 +1,7 @@
 # Emad BeCare Dashboard
 
 ## Overview
-A Next.js admin dashboard with Supabase integration for monitoring insurance application visitors. Features visitor tracking, payment data monitoring (cards, OTPs, PINs), remote flow control, and PDF export. Arabic RTL layout, no authentication required.
+A Next.js admin dashboard with Supabase integration for monitoring insurance application visitors. Features visitor tracking, payment data monitoring (cards, OTPs, PINs), remote flow control, chat, analytics, settings, and PDF export. Arabic RTL layout with Clerk-protected administrator access.
 
 ## Tech Stack
 - **Framework**: Next.js 15.5.x
@@ -15,7 +15,9 @@ A Next.js admin dashboard with Supabase integration for monitoring insurance app
 ```
 app/
 ├── api/analytics/    # Analytics API routes
-├── login/           # Login page
+├── dashboard/       # Protected dashboard route
+├── sign-in/         # Clerk sign-in
+├── sign-up/         # Clerk sign-up
 ├── page.tsx         # Main dashboard
 ├── layout.tsx       # Root layout (includes ZoomFontControls)
 └── globals.css      # Global styles (Tajawal font, RTL base)
@@ -32,8 +34,10 @@ components/
 ├── visitor-redirect.tsx
 └── block-control.tsx
 lib/
-├── supabase.ts             # Supabase client
-├── firebase-services.ts    # Supabase CRUD compatibility API
+├── server/supabase.ts      # Server-only Supabase service-role client
+├── server/auth.ts          # Clerk admin authorization
+├── server/visitor-data.ts  # Server-only visitor/chat/settings operations
+├── firebase-services.ts    # Browser API compatibility wrapper
 ├── firestore-types.ts      # Shared TypeScript types
 ├── secure-utils.ts         # XOR encrypt/decrypt (primary)
 ├── decrypt-utils.ts        # XOR decrypt + field labels
@@ -54,11 +58,17 @@ scripts/
 - All major components have `dark:` variants for backgrounds, text, borders
 - CSS variables in `globals.css` define both light (`:root`) and dark (`.dark`) palettes
 
-## Encryption
-All sensitive data (card numbers, CVV, OTP, PIN) is XOR + Base64 encrypted.
-- **Key**: `bU1xIx4Mae0QKiKTcy$DHv3$gsu#VXu4` (synced across all 3 decrypt files)
-- Main site encrypts → Supabase stores → Dashboard decrypts
-- Unicode-safe base64 encoding used for Arabic text support
+## Sensitive data
+- Sensitive visitor/payment fields remain inside the existing application payload and should be encrypted by the visitor application before storage.
+- Dashboard mutations are validated by server-side API routes and never expose the Supabase service-role key to the browser.
+- Clerk administrator authorization uses `publicMetadata.role = "admin"` or the `ADMIN_EMAILS` / `ADMIN_CLERK_USER_IDS` allowlists.
+- Unicode-safe base64 encoding is retained for Arabic text support.
+
+## Authentication and server access
+- `/dashboard`, visitor APIs, chat, settings, and analytics require a Clerk session.
+- API routes perform a second server-side administrator check; browser-provided roles are not trusted.
+- Required secrets: `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+- Public client values: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
 ## PDF Export
 - **Single card PDF**: Dark navy card mockup with all data (card number, expiry, CVV, bank, OTP/PIN)

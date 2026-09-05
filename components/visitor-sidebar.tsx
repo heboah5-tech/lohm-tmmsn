@@ -30,6 +30,12 @@ interface VisitorSidebarProps {
   onDeleteSelected: () => void;
   sidebarWidth: number;
   onSidebarWidthChange: (width: number) => void;
+  pagination?: {
+    page: number;
+    totalPages: number;
+    totalItems: number;
+    onPageChange: (page: number) => void;
+  };
 }
 
 const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
@@ -178,6 +184,7 @@ export function VisitorSidebar({
   onDeleteSelected,
   sidebarWidth,
   onSidebarWidthChange: _onSidebarWidthChange,
+  pagination,
 }: VisitorSidebarProps) {
   void _onSidebarWidthChange;
   const allSelected =
@@ -392,6 +399,31 @@ export function VisitorSidebar({
           })
         )}
       </div>
+      {pagination && (
+        <div className="flex shrink-0 items-center justify-between gap-2 border-t border-gray-100 bg-white px-3 py-2 text-[11px] dark:border-slate-800 dark:bg-slate-900">
+          <span className="text-gray-400 dark:text-slate-500">
+            {pagination.totalItems} نتيجة · {pagination.page}/{pagination.totalPages}
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              disabled={pagination.page <= 1}
+              onClick={() => pagination.onPageChange(pagination.page - 1)}
+              className="rounded-lg border border-gray-200 px-2 py-1 font-bold text-gray-600 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300"
+            >
+              السابق
+            </button>
+            <button
+              type="button"
+              disabled={pagination.page >= pagination.totalPages}
+              onClick={() => pagination.onPageChange(pagination.page + 1)}
+              className="rounded-lg border border-gray-200 px-2 py-1 font-bold text-gray-600 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300"
+            >
+              التالي
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
