@@ -1,0 +1,286 @@
+استخدم هذا الـ prompt مع Agent لإنشاء Dashboard متكامل للمشروع:
+
+```text
+Create a production-ready admin dashboard for the existing insurance application.
+
+First inspect the current Next.js project, existing routes, components, Supabase integration, API handlers, and database migration before making changes. Do not replace the current architecture or create a second database.
+
+Project stack:
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Supabase
+- PostgreSQL
+- Existing Supabase migration:
+  supabase/migrations/001_server_side_persistence.sql
+
+The dashboard must be Arabic-first and fully RTL.
+
+## Main dashboard requirements
+
+Create a protected dashboard route such as:
+
+/dashboard
+
+Use the existing Supabase database tables:
+
+- visitor_records
+- application_settings
+- chat_messages
+- page_view_events
+
+Do not expose SUPABASE_SERVICE_ROLE_KEY or any privileged Supabase client to the browser. All database operations must go through secure server-side Next.js API routes or server actions.
+
+## Dashboard layout
+
+Create:
+
+1. Responsive sidebar
+   - Overview
+   - Applications
+   - Online visitors
+   - Chat
+   - Analytics
+   - Settings
+
+2. Top navigation bar
+   - Dashboard title
+   - Current user/admin information
+   - Notifications for unread applications/messages
+   - Logout button
+   - Mobile menu support
+
+3. Arabic RTL interface
+   - Use Arabic labels
+   - Support responsive desktop, tablet, and mobile layouts
+   - Use accessible buttons, labels, keyboard navigation, and visible focus states
+   - Use consistent loading, empty, and error states
+
+## Overview page
+
+Display live summary cards:
+
+- Total visitors/applications
+- Applications pending review
+- Approved applications
+- Rejected applications
+- Currently online visitors
+- Unread applications
+- Completed payments
+- Page views today
+
+Add:
+
+- Recent applications table
+- Latest activity timeline
+- Recent page views chart
+- Quick actions
+- Refresh or polling behavior without creating duplicate requests
+
+## Applications page
+
+Use visitor_records as the main data source.
+
+Display a searchable and filterable table with:
+
+- Visitor/application ID
+- Applicant name
+- Phone number
+- National ID
+- Vehicle model
+- Insurance type
+- Application status
+- Payment status
+- Current page
+- Current step
+- Online/offline state
+- Created date
+- Updated date
+- Unread indicator
+
+Add filters for:
+
+- Status:
+  draft
+  pending_review
+  approved
+  rejected
+  completed
+- Payment status
+- Online status
+- Blocked status
+- Current page
+- Date range
+
+Add sorting and pagination.
+
+The data is stored inside visitor_records.data as JSONB. Use the existing server-side mapping and safely handle missing or malformed fields.
+
+## Application details
+
+When the admin selects an application, show a details panel or details page containing:
+
+- Applicant information
+- Vehicle information
+- Insurance information
+- Payment and verification information
+- Current page and step
+- Device/browser information
+- Activity history
+- Notes
+- Redirect state
+- Created and updated timestamps
+
+Add secure admin actions:
+
+- Approve application
+- Reject application
+- Set status
+- Redirect visitor to a specific page
+- Block visitor
+- Unblock visitor
+- Mark as read
+- Mark as unread
+- Add or update notes
+- Delete visitor record only after confirmation
+
+Every destructive or status-changing action must:
+- Require the correct authorization
+- Validate the input on the server
+- Show a confirmation dialog where appropriate
+- Display a success or error message
+- Refresh the affected data without a full page reload
+
+Do not allow unauthorized users to modify visitor records.
+
+## Chat page
+
+Use chat_messages.
+
+Create:
+
+- Conversation list grouped by application_id
+- Unread message count
+- Message thread view
+- Sender name and role
+- Timestamp
+- Read/unread state
+- Send message form
+- Mark messages as read
+
+Support roles:
+
+- customer
+- professional
+- admin
+
+Validate message length and reject empty messages on the server.
+
+## Analytics page
+
+Use page_view_events.
+
+Display:
+
+- Total page views
+- Unique visitors
+- Views by page
+- Views over time
+- Event counts
+- Recent events
+- Date range filtering
+
+Use charts only where they improve understanding. Avoid fake or hardcoded analytics data.
+
+## Settings page
+
+Use application_settings with the id:
+
+app_settings
+
+Support editing:
+
+- blockedCardBins
+- allowedCountries
+
+Validate settings on the server:
+
+- Only arrays of strings
+- Reasonable maximum lengths
+- Trim empty values
+- Show current values clearly
+- Confirm before saving if necessary
+
+## API and security requirements
+
+Create or reuse secure API endpoints for:
+
+- Listing visitors
+- Getting one visitor
+- Updating a visitor
+- Deleting a visitor
+- Listing chat messages
+- Creating chat messages
+- Marking messages as read
+- Reading and updating settings
+- Reading analytics
+
+Requirements:
+
+- Keep Supabase service-role access server-only
+- Validate all request bodies
+- Validate visitor IDs
+- Validate status values
+- Validate redirect pages against an allowlist
+- Prevent arbitrary JSON from overwriting protected database columns
+- Do not trust role information sent from the browser
+- Return consistent JSON responses
+- Handle Supabase errors gracefully
+- Do not silently fail
+
+Use the existing application API patterns where possible.
+
+## Visual design
+
+Use a clean modern admin dashboard design:
+
+- White cards on a subtle gray background
+- Blue as the primary action color
+- Clear status badges
+- Good spacing and typography
+- RTL-friendly tables
+- Responsive tables that become cards on mobile
+- Skeleton loaders
+- Toast notifications
+- Empty states with useful explanations
+- Confirmation dialogs for dangerous actions
+
+Do not use fake data in production components. If mock data is needed temporarily during development, clearly isolate it and replace it with real API data before finishing.
+
+## Implementation process
+
+1. Inspect the existing codebase first.
+2. Reuse existing layout, styles, types, and API utilities where possible.
+3. Implement the server-side data layer before the UI.
+4. Add the dashboard pages and reusable components.
+5. Add authorization checks for every mutation.
+6. Test all loading, empty, error, success, and unauthorized states.
+7. Verify RTL layout on desktop and mobile.
+8. Run TypeScript checks, lint checks, and build checks.
+9. Start the workflow and verify /dashboard in the browser.
+10. Do not modify unrelated insurance flow pages unless required for integration.
+
+At the end, provide:
+- Files changed
+- New routes and API endpoints
+- Database tables used
+- Authorization approach
+- Verification results
+- Any remaining limitations
+```
+
+مهم: إذا كان الـ Dashboard مخصصًا لـ **Admin فقط**، أضف هذه الجملة في بداية الـ prompt:
+
+```text
+This dashboard is for authorized administrators only. Implement route protection and server-side authorization before rendering or mutating any dashboard data.
+```
