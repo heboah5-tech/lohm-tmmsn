@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getAllApplications } from '@/lib/firebase-services';
+import { authorizationResponse, requireAdmin } from '@/lib/server/auth';
+import {
+  getPageViewEvents,
+  listVisitorRecords,
+} from '@/lib/server/visitor-data';
 
 const toTimeValue = (value: unknown): number => {
   if (!value) return 0;
@@ -22,8 +26,10 @@ const toTimeValue = (value: unknown): number => {
 
 export async function GET() {
   try {
+    await requireAdmin();
     // Get all visitors
-    const allVisitors = await getAllApplications();
+    const allVisitors = await listVisitorRecords();
+    const pageViewEvents = await getPageViewEvents();
     
     // Calculate timestamps
     const now = new Date();
@@ -106,6 +112,33 @@ export async function GET() {
     const countries = Object.entries(countryCounts)
       .map(([country, users]) => ({ country, users }))
       .sort((a, b) => b.users - a.users);
+
+    const todayPageViews = pageViewEvents.filter((event) => {
+      const createdAt = new Date(event.created_at);
+      return createdAt >= todayStart;
+    });
+    const uniqueVisitors = new Set(
+      pageViewEvents
+        .map((event) => event.visitor_id)
+        .filter((visitorId): visitorId is string => Boolean(visitorId)),
+    ).size;
+    const viewsByPage = Object.entries(
+      pageViewEvents.reduce<Record<string, number>>((counts, event) => {
+        const page = event.page || "غير محدد";
+        counts[page] = (counts[page] || 0) + 1;
+        return counts;
+      }, {}),
+    )
+      .map(([page, views]) => ({ page, views }))
+      .sort((a, b) => b.views - a.views);
+    const eventCounts = Object.entries(
+      pageViewEvents.reduce<Record<string, number>>((counts, event) => {
+        counts[event.event_name] = (counts[event.event_name] || 0) + 1;
+        return counts;
+      }, {}),
+    )
+      .map(([event, count]) => ({ event, count }))
+      .sort((a, b) => b.count - a.count);
     
     return NextResponse.json({
       activeUsers,
@@ -115,8 +148,17 @@ export async function GET() {
       visitorsWithPhone,
       devices,
       countries,
+      pageViews: pageViewEvents.length,
+      todayPageViews: todayPageViews.length,
+      uniqueVisitors,
+      viewsByPage,
+      eventCounts,
+      recentEvents: pageViewEvents.slice(0, 50),
     });
   } catch (error: any) {
+    if (error instanceof Error && "status" in error) {
+      return authorizationResponse(error);
+    }
     console.error('Error fetching analytics:', error);
     return NextResponse.json(
       { 

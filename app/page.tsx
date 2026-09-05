@@ -11,6 +11,8 @@ import { VisitorSidebar } from "@/components/visitor-sidebar";
 import { VisitorDetails } from "@/components/visitor-details";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { toast } from "sonner";
+import { useAuth } from "@clerk/nextjs";
+import Link from "next/link";
 
 const toTimeValue = (value: unknown): number => {
   if (!value) return 0;
@@ -151,6 +153,7 @@ const showCardNotification = (visitors: InsuranceApplication[]) => {
 };
 
 export default function Dashboard() {
+  const { isLoaded, isSignedIn } = useAuth();
   const [applications, setApplications] = useState<InsuranceApplication[]>([]);
   const [selectedVisitor, setSelectedVisitor] =
     useState<InsuranceApplication | null>(null);
@@ -179,6 +182,8 @@ export default function Dashboard() {
 
   // Subscribe to Supabase
   useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
     let unsubscribe: (() => void) | undefined;
 
     try {
@@ -192,19 +197,19 @@ export default function Dashboard() {
       const now = new Date();
       const thirtySecondsAgoTime = now.getTime() - 30 * 1000;
 
-      const appsWithOnlineStatus = validApps.map((app) => {
+       const appsWithOnlineStatus = validApps.map((app) => {
         const lastActivityTime = toTimeValue(app.lastActiveAt ?? app.lastSeen);
         const isOnline = lastActivityTime > 0 && lastActivityTime >= thirtySecondsAgoTime;
 
         return { ...app, isOnline };
-      });
+       });
 
       // Sort visitors by latest activity (card/OTP/history/updates) newest first
       const sorted = appsWithOnlineStatus.sort((a, b) => {
         const timeA = getPrioritySortTime(a);
         const timeB = getPrioritySortTime(b);
         return timeB - timeA; // Most recent first
-      });
+       });
 
       // Update the order ref
       visitorOrderRef.current = sorted
@@ -282,6 +287,9 @@ export default function Dashboard() {
 
         return prev;
       });
+      }, (error: Error) => {
+        setDatabaseError(error.message);
+        setLoading(false);
       });
     } catch (error) {
       console.error("Supabase configuration error:", error);
@@ -294,7 +302,7 @@ export default function Dashboard() {
     }
 
     return () => unsubscribe?.();
-  }, []);
+  }, [isLoaded, isSignedIn]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -438,7 +446,7 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900">
         <div className="text-center">
@@ -446,6 +454,33 @@ export default function Dashboard() {
             <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/30 border-t-white"></div>
           </div>
           <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium text-sm">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div
+        className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40 p-6 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900"
+        dir="rtl"
+      >
+        <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xl dark:border-slate-800 dark:bg-slate-900">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-2xl dark:bg-blue-950/50">
+            🔐
+          </div>
+          <h1 className="mt-5 text-xl font-extrabold text-slate-900 dark:text-white">
+            لوحة الإدارة محمية
+          </h1>
+          <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+            سجّل الدخول بحساب إداري للوصول إلى بيانات الزوار.
+          </p>
+          <Link
+            href="/sign-in?redirect_url=/dashboard"
+            className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+          >
+            تسجيل الدخول
+          </Link>
         </div>
       </div>
     );

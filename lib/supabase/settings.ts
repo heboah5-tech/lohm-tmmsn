@@ -1,62 +1,38 @@
-import { getSupabaseClient } from "@/lib/supabase";
-
 export interface Settings {
   blockedCardBins: string[];
   allowedCountries: string[];
 }
 
-const SETTINGS_ID = "app_settings";
-const DEFAULT_SETTINGS: Settings = {
-  blockedCardBins: [],
-  allowedCountries: [],
-};
-
-const normalizeSettings = (value: unknown): Settings => {
-  const settings =
-    value && typeof value === "object"
-      ? (value as Record<string, unknown>)
-      : {};
-
-  return {
-    blockedCardBins: Array.isArray(settings.blockedCardBins)
-      ? settings.blockedCardBins.filter((value): value is string => typeof value === "string")
-      : [],
-    allowedCountries: Array.isArray(settings.allowedCountries)
-      ? settings.allowedCountries.filter((value): value is string => typeof value === "string")
-      : [],
-  };
+const requestSettings = async <T>(
+  init?: RequestInit,
+): Promise<T> => {
+  const response = await fetch("/api/dashboard/settings", {
+    ...init,
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+      ...(init?.headers || {}),
+    },
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || "Settings request failed");
+  }
+  return payload as T;
 };
 
 export async function getSettings(): Promise<Settings> {
-  const { data, error } = await getSupabaseClient()
-    .from("application_settings")
-    .select("settings")
-    .eq("id", SETTINGS_ID)
-    .maybeSingle();
-
-  if (error) throw error;
-  if (!data) {
-    await saveSettings(DEFAULT_SETTINGS);
-    return DEFAULT_SETTINGS;
-  }
-
-  return normalizeSettings(data.settings);
+  const result = await requestSettings<{ data: Settings }>();
+  return result.data;
 }
 
-async function saveSettings(settings: Settings) {
-  const { error } = await getSupabaseClient()
-    .from("application_settings")
-    .upsert(
-      { id: SETTINGS_ID, settings },
-      { onConflict: "id" },
-    );
-
-  if (error) throw error;
+export async function updateSettings(settings: Settings) {
+  await requestSettings({ method: "PATCH", body: JSON.stringify(settings) });
 }
 
 export async function updateBlockedCardBins(bins: string[]) {
   const settings = await getSettings();
-  await saveSettings({ ...settings, blockedCardBins: bins });
+  await updateSettings({ ...settings, blockedCardBins: bins });
 }
 
 export async function addBlockedCardBin(bin: string) {
@@ -73,14 +49,14 @@ export async function removeBlockedCardBin(bin: string) {
 
 export async function updateAllowedCountries(countries: string[]) {
   const settings = await getSettings();
-  await saveSettings({ ...settings, allowedCountries: countries });
+  await updateSettings({ ...settings, allowedCountries: countries });
 }
 
 export async function addAllowedCountry(country: string) {
-  const normalizedCountry = country.toUpperCase();
+  const normalized = country.toUpperCase();
   const settings = await getSettings();
-  if (!settings.allowedCountries.includes(normalizedCountry)) {
-    await updateAllowedCountries([...settings.allowedCountries, normalizedCountry]);
+  if (!settings.allowedCountries.includes(normalized)) {
+    await updateAllowedCountries([...settings.allowedCountries, normalized]);
   }
 }
 

@@ -1,0 +1,22 @@
+import { SignIn } from "@clerk/nextjs";
+
+export default function SignInPage() {
+  return (
+    <main className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40 px-4 py-10 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900">
+      <SignIn
+        routing="path"
+        path="/sign-in"
+        signUpUrl="/sign-up"
+        appearance={{
+          variables: {
+            colorPrimary: "#2563eb",
+            colorBackground: "white",
+            colorForeground: "#0f172a",
+            borderRadius: "1rem",
+            fontFamily: "Cairo, Tajawal, sans-serif",
+          },
+        }}
+      />
+    </main>
+  );
+}

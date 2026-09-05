@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { AppToaster } from "@/components/app-toaster";
 import { ZoomFontControls } from "@/components/zoom-font-controls";
@@ -24,11 +25,13 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ClientProviders>
-          {children}
-          <AppToaster />
-          <ZoomFontControls />
-        </ClientProviders>
+        <ClerkProvider publishableKey={process.env.CLERK_PUBLISHABLE_KEY}>
+          <ClientProviders>
+            {children}
+            <AppToaster />
+            <ZoomFontControls />
+          </ClientProviders>
+        </ClerkProvider>
       </body>
     </html>
   );
