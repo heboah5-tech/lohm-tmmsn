@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 import { SettingsModal } from "@/components/settings-modal"
 import { Settings, Activity, Users, UserCheck, CreditCard, Smartphone } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
@@ -59,9 +60,14 @@ export function DashboardHeader() {
     <header className="border-b border-[#e5e8ee] bg-white text-[#253044] dark:border-slate-800 dark:bg-slate-950 dark:text-white">
       <div className="flex min-h-[52px] items-center gap-3 px-3 md:px-5" dir="ltr">
         <div className="flex shrink-0 items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0b72ce] text-[10px] font-black tracking-tight text-white shadow-sm">
-            BC
-          </div>
+          <Image
+            src="/tameeni_logo.svg"
+            alt="Tamini"
+            width={24}
+            height={32}
+            priority
+            className="h-8 w-6 object-contain"
+          />
           <div className="hidden sm:block">
             <p className="text-[12px] font-black leading-none tracking-tight text-[#0b72ce]">Tamini</p>
             <p className="mt-0.5 text-[8px] font-medium text-slate-400">ADMIN CONSOLE</p>
