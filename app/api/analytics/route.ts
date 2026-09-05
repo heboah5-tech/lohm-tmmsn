@@ -1,16 +1,11 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { collection, getDocs, Timestamp } from 'firebase/firestore';
+import { getAllApplications } from '@/lib/firebase-services';
 
 const toTimeValue = (value: unknown): number => {
   if (!value) return 0;
 
   if (value instanceof Date) {
     return value.getTime();
-  }
-
-  if (value instanceof Timestamp) {
-    return value.toDate().getTime();
   }
 
   if (typeof value === 'object' && value !== null && typeof (value as any).toDate === 'function') {
@@ -27,14 +22,8 @@ const toTimeValue = (value: unknown): number => {
 
 export async function GET() {
   try {
-    const paysCollection = collection(db, 'pays');
-    
     // Get all visitors
-    const allVisitorsSnapshot = await getDocs(paysCollection);
-    const allVisitors = allVisitorsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as any[];
+    const allVisitors = await getAllApplications();
     
     // Calculate timestamps
     const now = new Date();
@@ -52,18 +41,14 @@ export async function GET() {
     // Count today's visitors
     const todayVisitors = allVisitors.filter(visitor => {
       if (!visitor.createdAt) return false;
-      const createdAt = visitor.createdAt instanceof Timestamp 
-        ? visitor.createdAt.toDate() 
-        : new Date(visitor.createdAt);
+      const createdAt = new Date(visitor.createdAt);
       return createdAt >= todayStart;
     }).length;
     
     // Count total visitors (last 30 days)
     const totalVisitors = allVisitors.filter(visitor => {
       if (!visitor.createdAt) return false;
-      const createdAt = visitor.createdAt instanceof Timestamp 
-        ? visitor.createdAt.toDate() 
-        : new Date(visitor.createdAt);
+      const createdAt = new Date(visitor.createdAt);
       return createdAt >= thirtyDaysAgo;
     }).length;
     

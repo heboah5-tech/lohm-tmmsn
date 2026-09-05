@@ -9,7 +9,7 @@ import {
   addAllowedCountry, 
   removeAllowedCountry,
   type Settings 
-} from "@/lib/firebase/settings"
+} from "@/lib/supabase/settings"
 import { toast } from "sonner"
 
 interface SettingsModalProps {

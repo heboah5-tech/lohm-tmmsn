@@ -1,12 +1,12 @@
 /**
  * Convert timestamp to Arabic "time ago" format
- * @param timestamp - Date object or Firestore timestamp
+ * @param timestamp - Date object or ISO timestamp
  * @returns Arabic string like "منذ 5 ثوانٍ" or "منذ دقيقتين"
  */
 export function getTimeAgo(timestamp: Date | any): string {
   let date: Date
   
-  // Handle Firestore timestamp
+  // Also support legacy timestamp-like objects while old records are migrated.
   if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp) {
     date = timestamp.toDate()
   } else if (timestamp instanceof Date) {

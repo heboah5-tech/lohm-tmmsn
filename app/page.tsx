@@ -10,7 +10,6 @@ import type { InsuranceApplication } from "@/lib/firestore-types";
 import { VisitorSidebar } from "@/components/visitor-sidebar";
 import { VisitorDetails } from "@/components/visitor-details";
 import { DashboardHeader } from "@/components/dashboard-header";
-import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
 
 const toTimeValue = (value: unknown): number => {
@@ -18,10 +17,6 @@ const toTimeValue = (value: unknown): number => {
 
   if (value instanceof Date) {
     return value.getTime();
-  }
-
-  if (value instanceof Timestamp) {
-    return value.toDate().getTime();
   }
 
   if (typeof value === "object" && typeof (value as any).toDate === "function") {
@@ -166,6 +161,7 @@ export default function Dashboard() {
   const [cardFilter, setCardFilter] = useState<"all" | "hasCard">("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [databaseError, setDatabaseError] = useState<string | null>(null);
   const [sidebarWidth, setSidebarWidth] = useState(215); // Default landscape width
   const hasLoadedInitialSnapshotRef = useRef(false);
   const previousUnreadIds = useRef<Set<string>>(new Set());
@@ -181,9 +177,12 @@ export default function Dashboard() {
     audio.play().catch((e) => console.log("Could not play sound:", e));
   };
 
-  // Subscribe to Firebase
+  // Subscribe to Supabase
   useEffect(() => {
-    const unsubscribe = subscribeToApplications((apps) => {
+    let unsubscribe: (() => void) | undefined;
+
+    try {
+      unsubscribe = subscribeToApplications((apps) => {
       const isInitialSnapshot = !hasLoadedInitialSnapshotRef.current;
 
       // Keep any visitor that has meaningful progress data (including STC-only flow).
@@ -283,9 +282,18 @@ export default function Dashboard() {
 
         return prev;
       });
-    });
+      });
+    } catch (error) {
+      console.error("Supabase configuration error:", error);
+      window.setTimeout(() => {
+        setDatabaseError(
+          "قاعدة البيانات غير مهيأة. أضف NEXT_PUBLIC_SUPABASE_URL و NEXT_PUBLIC_SUPABASE_ANON_KEY إلى متغيرات البيئة ثم أعد تشغيل التطبيق.",
+        );
+        setLoading(false);
+      }, 0);
+    }
 
-    return () => unsubscribe();
+    return () => unsubscribe?.();
   }, []);
 
   useEffect(() => {
@@ -438,6 +446,32 @@ export default function Dashboard() {
             <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/30 border-t-white"></div>
           </div>
           <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium text-sm">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (databaseError) {
+    return (
+      <div
+        className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-indigo-50/40 p-6 dark:from-slate-950 dark:via-gray-950 dark:to-slate-900"
+        dir="rtl"
+      >
+        <div className="w-full max-w-xl rounded-3xl border border-amber-200 bg-white p-8 text-center shadow-xl shadow-amber-100/50 dark:border-amber-900/50 dark:bg-slate-900 dark:shadow-none">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-2xl dark:bg-amber-950/50">
+            ⚙️
+          </div>
+          <h1 className="mt-5 text-xl font-extrabold text-slate-900 dark:text-white">
+            يلزم إعداد اتصال قاعدة البيانات
+          </h1>
+          <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+            {databaseError}
+          </p>
+          <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-left font-mono text-xs text-slate-600 dark:bg-slate-950 dark:text-slate-300" dir="ltr">
+            NEXT_PUBLIC_SUPABASE_URL
+            <br />
+            NEXT_PUBLIC_SUPABASE_ANON_KEY
+          </p>
         </div>
       </div>
     );

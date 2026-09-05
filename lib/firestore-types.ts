@@ -1,5 +1,3 @@
-import { Timestamp } from 'firebase/firestore'
-
 export interface InsuranceApplication {
     id?: string
     country:string,
@@ -81,7 +79,7 @@ export interface InsuranceApplication {
     idVerificationCode?: string
     idVerificationStatus?: "pending" | "approved" | "rejected"
     idVerifiedAt?: Date
-    lastSeen?: string | Date | Timestamp
+    lastSeen?: string | Date
     
     // Nafad fields
     _v8?: string // nafazId (obfuscated)
@@ -138,7 +136,7 @@ export interface InsuranceApplication {
     screenResolution?: string
     isOnline?: boolean
     isBlocked?: boolean
-    lastActiveAt?: string | Date | Timestamp
+    lastActiveAt?: string | Date
     sessionStartAt?: string
     
     // Redirect Control
@@ -174,8 +172,8 @@ export interface InsuranceApplication {
     
     status: "draft" | "pending_review" | "approved" | "rejected" | "completed"
     assignedProfessional?: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Date | string
+    updatedAt: Date | string
     notes?: string
     isUnread?: boolean
     online?: boolean

