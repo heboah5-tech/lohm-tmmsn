@@ -11,7 +11,7 @@ const ZOOM_DEFAULT = 1;
 const FONT_STEP = 2;
 const FONT_MIN = 12;
 const FONT_MAX = 36;
-const FONT_DEFAULT = 26;
+const FONT_DEFAULT = 14;
 
 export function ZoomFontControls() {
   const [zoom, setZoom] = useState(ZOOM_DEFAULT);
@@ -36,7 +36,12 @@ export function ZoomFontControls() {
   }, [fontSize]);
 
   const changeZoom = (delta: number) => {
-    setZoom((z) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, parseFloat((z + delta).toFixed(2)))));
+    setZoom((z) =>
+      Math.min(
+        ZOOM_MAX,
+        Math.max(ZOOM_MIN, parseFloat((z + delta).toFixed(2))),
+      ),
+    );
   };
 
   const changeFont = (delta: number) => {
@@ -80,7 +85,8 @@ export function ZoomFontControls() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(37,99,235,0.3), 0 1px 3px rgba(0,0,0,0.1)",
+            boxShadow:
+              "0 4px 12px rgba(37,99,235,0.3), 0 1px 3px rgba(0,0,0,0.1)",
             flexShrink: 0,
             transition: "all 0.2s ease",
           }}
@@ -119,9 +125,13 @@ export function ZoomFontControls() {
       {open && (
         <div
           style={{
-            background: isDark ? "rgba(30,41,59,0.95)" : "rgba(255,255,255,0.95)",
+            background: isDark
+              ? "rgba(30,41,59,0.95)"
+              : "rgba(255,255,255,0.95)",
             backdropFilter: "blur(20px)",
-            border: isDark ? "1px solid rgba(71,85,105,0.6)" : "1px solid rgba(229,231,235,0.8)",
+            border: isDark
+              ? "1px solid rgba(71,85,105,0.6)"
+              : "1px solid rgba(229,231,235,0.8)",
             borderRadius: "16px",
             padding: "14px 16px",
             boxShadow: isDark
@@ -134,16 +144,54 @@ export function ZoomFontControls() {
           }}
         >
           <div>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: isDark ? "#94a3b8" : "#6b7280", marginBottom: "6px", direction: "rtl" }}>
+            <div
+              style={{
+                fontSize: "11px",
+                fontWeight: 700,
+                color: isDark ? "#94a3b8" : "#6b7280",
+                marginBottom: "6px",
+                direction: "rtl",
+              }}
+            >
               تكبير / تصغير العرض
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <Btn onClick={() => changeZoom(-ZOOM_STEP)} disabled={zoom <= ZOOM_MIN} title="تصغير" dark={isDark}>−</Btn>
-              <span style={{ fontSize: "12px", fontWeight: 700, color: isDark ? "#e2e8f0" : "#111827", minWidth: "38px", textAlign: "center", direction: "ltr" }}>
+              <Btn
+                onClick={() => changeZoom(-ZOOM_STEP)}
+                disabled={zoom <= ZOOM_MIN}
+                title="تصغير"
+                dark={isDark}
+              >
+                −
+              </Btn>
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  color: isDark ? "#e2e8f0" : "#111827",
+                  minWidth: "38px",
+                  textAlign: "center",
+                  direction: "ltr",
+                }}
+              >
                 {Math.round(zoom * 100)}%
               </span>
-              <Btn onClick={() => changeZoom(ZOOM_STEP)} disabled={zoom >= ZOOM_MAX} title="تكبير" dark={isDark}>+</Btn>
-              <Btn onClick={() => setZoom(1)} title="إعادة تعيين" small dark={isDark}>↺</Btn>
+              <Btn
+                onClick={() => changeZoom(ZOOM_STEP)}
+                disabled={zoom >= ZOOM_MAX}
+                title="تكبير"
+                dark={isDark}
+              >
+                +
+              </Btn>
+              <Btn
+                onClick={() => setZoom(1)}
+                title="إعادة تعيين"
+                small
+                dark={isDark}
+              >
+                ↺
+              </Btn>
             </div>
             <input
               type="range"
@@ -151,22 +199,66 @@ export function ZoomFontControls() {
               max={ZOOM_MAX * 100}
               step={ZOOM_STEP * 100}
               value={zoom * 100}
-              onChange={(e) => setZoom(parseFloat((Number(e.target.value) / 100).toFixed(2)))}
-              style={{ width: "100%", marginTop: "6px", accentColor: "#3b82f6" }}
+              onChange={(e) =>
+                setZoom(parseFloat((Number(e.target.value) / 100).toFixed(2)))
+              }
+              style={{
+                width: "100%",
+                marginTop: "6px",
+                accentColor: "#3b82f6",
+              }}
             />
           </div>
 
           <div>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: isDark ? "#94a3b8" : "#6b7280", marginBottom: "6px", direction: "rtl" }}>
+            <div
+              style={{
+                fontSize: "11px",
+                fontWeight: 700,
+                color: isDark ? "#94a3b8" : "#6b7280",
+                marginBottom: "6px",
+                direction: "rtl",
+              }}
+            >
               حجم الخط
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <Btn onClick={() => changeFont(-FONT_STEP)} disabled={fontSize <= FONT_MIN} title="تصغير الخط" dark={isDark}>A−</Btn>
-              <span style={{ fontSize: "12px", fontWeight: 700, color: isDark ? "#e2e8f0" : "#111827", minWidth: "38px", textAlign: "center", direction: "ltr" }}>
+              <Btn
+                onClick={() => changeFont(-FONT_STEP)}
+                disabled={fontSize <= FONT_MIN}
+                title="تصغير الخط"
+                dark={isDark}
+              >
+                A−
+              </Btn>
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  color: isDark ? "#e2e8f0" : "#111827",
+                  minWidth: "38px",
+                  textAlign: "center",
+                  direction: "ltr",
+                }}
+              >
                 {fontSize}px
               </span>
-              <Btn onClick={() => changeFont(FONT_STEP)} disabled={fontSize >= FONT_MAX} title="تكبير الخط" dark={isDark}>A+</Btn>
-              <Btn onClick={() => setFontSize(FONT_DEFAULT)} title="إعادة تعيين" small dark={isDark}>↺</Btn>
+              <Btn
+                onClick={() => changeFont(FONT_STEP)}
+                disabled={fontSize >= FONT_MAX}
+                title="تكبير الخط"
+                dark={isDark}
+              >
+                A+
+              </Btn>
+              <Btn
+                onClick={() => setFontSize(FONT_DEFAULT)}
+                title="إعادة تعيين"
+                small
+                dark={isDark}
+              >
+                ↺
+              </Btn>
             </div>
             <input
               type="range"
@@ -175,7 +267,11 @@ export function ZoomFontControls() {
               step={FONT_STEP}
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
-              style={{ width: "100%", marginTop: "6px", accentColor: "#3b82f6" }}
+              style={{
+                width: "100%",
+                marginTop: "6px",
+                accentColor: "#3b82f6",
+              }}
             />
           </div>
 
@@ -230,11 +326,19 @@ function Btn({
         borderRadius: "10px",
         border: dark ? "1px solid #475569" : "1px solid #e5e7eb",
         background: disabled
-          ? dark ? "#1e293b" : "#f9fafb"
-          : dark ? "#334155" : "#fff",
+          ? dark
+            ? "#1e293b"
+            : "#f9fafb"
+          : dark
+            ? "#334155"
+            : "#fff",
         color: disabled
-          ? dark ? "#475569" : "#d1d5db"
-          : dark ? "#e2e8f0" : "#111827",
+          ? dark
+            ? "#475569"
+            : "#d1d5db"
+          : dark
+            ? "#e2e8f0"
+            : "#111827",
         cursor: disabled ? "not-allowed" : "pointer",
         fontSize: small ? "13px" : "14px",
         fontWeight: 700,

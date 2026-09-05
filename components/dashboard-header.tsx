@@ -63,7 +63,7 @@ export function DashboardHeader() {
             BC
           </div>
           <div className="hidden sm:block">
-            <p className="text-[12px] font-black leading-none tracking-tight text-[#0b72ce]">BCare Flow</p>
+            <p className="text-[12px] font-black leading-none tracking-tight text-[#0b72ce]">Tamini</p>
             <p className="mt-0.5 text-[8px] font-medium text-slate-400">ADMIN CONSOLE</p>
           </div>
         </div>
