@@ -266,7 +266,7 @@ export function DataBubble({
                   <span className="font-bold text-white/95" style={{ fontSize: "17px", letterSpacing: "0.04em" }}>
                     {bin.bankNameAr || (bankName && bankName !== "غير محدد" ? bankName.toString() : "BANK NAME")}
                   </span>
-                  {(bin.data?.level || cardLevel) ? (
+                  {(bin.data?.brand || cardLevel) ? (
                     <span style={{
                       fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em",
                       color: "#e8d48b", background: "rgba(232,212,139,0.12)",
@@ -274,14 +274,14 @@ export function DataBubble({
                       borderRadius: "6px", padding: "2px 8px",
                       display: "inline-block", textTransform: "uppercase",
                     }}>
-                      {bin.data?.level || cardLevel}
+                      {bin.data?.brand || cardLevel}
                     </span>
                   ) : null}
                   {bin.data && (
                     <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
-                      {bin.data.currency && (
+                      {bin.data.country?.currency && (
                         <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.08)", borderRadius: "4px", padding: "1px 6px" }}>
-                          {bin.data.currency}
+                          {bin.data.country.currency}
                         </span>
                       )}
                       {bin.data.type && (
@@ -364,7 +364,7 @@ export function DataBubble({
                   </span>
                   {bin.data?.country?.alpha2 && (
                     <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em" }}>
-                      {bin.countryAr || bin.data.country.country} ({bin.data.country.alpha2})
+                      {bin.countryAr || bin.data.country.name} ({bin.data.country.alpha2})
                     </span>
                   )}
                 </div>

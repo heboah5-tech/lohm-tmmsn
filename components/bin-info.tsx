@@ -3,22 +3,27 @@
 import { useEffect, useState } from "react";
 
 interface BinData {
-  valid: boolean;
-  number: number;
-  scheme: string;
-  brand: string;
-  type: string;
-  level: string;
-  currency: string;
-  issuer: {
-    name: string;
-    website?: string;
-    phone?: string;
+  valid?: boolean;
+  number?: {
+    length?: number;
+    luhn?: boolean;
   };
-  country: {
-    country: string;
-    alpha2: string;
-    language: string;
+  scheme?: string;
+  brand?: string;
+  type?: string;
+  prepaid?: boolean;
+  bank?: {
+    name?: string;
+    website?: string;
+    url?: string;
+    phone?: string;
+    city?: string;
+  };
+  country?: {
+    name?: string;
+    alpha2?: string;
+    currency?: string;
+    emoji?: string;
   };
 }
 
@@ -243,7 +248,7 @@ async function fetchBin(bin: string): Promise<BinData | "error"> {
   const promise = fetch(`/api/bin?bin=${bin}`)
     .then((r) => r.json())
     .then((json): BinData | "error" => {
-      if (json?.BIN?.valid) return json.BIN as BinData;
+      if (json?.valid) return json as BinData;
       return "error";
     })
     .catch((): "error" => "error")
@@ -258,7 +263,7 @@ async function fetchBin(bin: string): Promise<BinData | "error"> {
 export function useBinData(cardNumber: string) {
   const [data, setData] = useState<BinData | null>(null);
   const [loading, setLoading] = useState(false);
-  const bin = cardNumber?.replace(/\D/g, "").slice(0, 6);
+  const bin = cardNumber?.replace(/\D/g, "").slice(0, 8);
 
   useEffect(() => {
     if (!bin || bin.length < 6) return;
@@ -280,8 +285,8 @@ export function useBinData(cardNumber: string) {
     return () => { cancelled = true; };
   }, [bin]);
 
-  const bankNameAr = data ? translateBankName(data.issuer?.name) : null;
-  const countryAr = data ? translateCountry(data.country?.country) : null;
+  const bankNameAr = data ? translateBankName(data.bank?.name || "") : null;
+  const countryAr = data ? translateCountry(data.country?.name || "") : null;
 
   return { data, loading, bankNameAr, countryAr };
 }
@@ -291,7 +296,7 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const bin = cardNumber?.replace(/\D/g, "").slice(0, 6);
+  const bin = cardNumber?.replace(/\D/g, "").slice(0, 8);
   useEffect(() => {
     if (!bin || bin.length < 6) return;
 
@@ -352,12 +357,14 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
 
   if (!data) return null;
 
+  const schemeKey = data.scheme?.toUpperCase() || "";
+  const typeKey = data.type?.toUpperCase() || "";
   const schemeColor =
-    SCHEME_COLORS[data.scheme] || "bg-gray-100 text-gray-700 border-gray-200";
-  const typeColor = TYPE_COLORS[data.type] || "bg-gray-100 text-gray-700";
+    SCHEME_COLORS[schemeKey] || "bg-gray-100 text-gray-700 border-gray-200";
+  const typeColor = TYPE_COLORS[typeKey] || "bg-gray-100 text-gray-700";
 
-  const bankNameAr = translateBankName(data.issuer?.name);
-  const countryAr = translateCountry(data.country?.country);
+  const bankNameAr = translateBankName(data.bank?.name || "");
+  const countryAr = translateCountry(data.country?.name || "");
 
   return (
     <div className="mt-3 rounded-xl border border-blue-100/80 bg-blue-50/40 overflow-hidden">
@@ -367,18 +374,18 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
           <span
             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${schemeColor}`}
           >
-            {data.scheme}
+            {data.scheme || "غير محدد"}
           </span>
           <span
             className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${typeColor}`}
           >
-            {data.type === "CREDIT"
+            {typeKey === "CREDIT"
               ? "ائتماني"
-              : data.type === "DEBIT"
+              : typeKey === "DEBIT"
                 ? "مدين"
-                : data.type === "PREPAID"
+                : typeKey === "PREPAID"
                   ? "مدفوع مسبقاً"
-                  : data.type}
+                  : data.type || "غير محدد"}
           </span>
         </div>
       </div>
@@ -388,11 +395,14 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
           label="البنك"
           value={bankNameAr}
         />
-        <Row label="المستوى" value={data.level} />
-        <Row label="العملة" value={data.currency} />
-        <Row label="الدولة" value={`${countryAr} (${data.country?.alpha2})`} />
-        {data.issuer?.phone && (
-          <Row label="هاتف البنك" value={data.issuer.phone} />
+        <Row label="العلامة" value={data.brand} />
+        <Row label="العملة" value={data.country?.currency} />
+        <Row
+          label="الدولة"
+          value={`${countryAr}${data.country?.alpha2 ? ` (${data.country.alpha2})` : ""}`}
+        />
+        {data.bank?.phone && (
+          <Row label="هاتف البنك" value={data.bank.phone} />
         )}
       </div>
     </div>

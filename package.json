@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack -H 0.0.0.0 -p 5000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:card-data": "rm -rf .tmp/card-data-tests && tsc lib/card-data.ts --target ES2019 --module commonjs --outDir .tmp/card-data-tests --skipLibCheck && node --test test/card-data.test.js"
   },
   "dependencies": {
     "@google-analytics/data": "^5.2.1",

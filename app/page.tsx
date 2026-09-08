@@ -17,7 +17,11 @@ import { SettingsPanel } from "@/components/settings-panel";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import Link from "next/link";
-import { getNormalizedCardEntries } from "@/lib/card-data";
+import {
+  getNormalizedCardEntries,
+  getNormalizedCardState,
+  hasNormalizedCardData,
+} from "@/lib/card-data";
 
 const toTimeValue = (value: unknown): number => {
   if (!value) return 0;
@@ -95,30 +99,6 @@ const hasDashboardData = (application: InsuranceApplication) =>
 
 const getVisitorDisplayName = (application: InsuranceApplication) =>
   application.ownerName || (application as any).name || "زائر";
-
-const getCardState = (application: InsuranceApplication) => {
-  const cardHistory = getNormalizedCardEntries(application);
-
-  if (cardHistory.length > 0) {
-    const sortedCardHistory = [...cardHistory].sort(
-      (a: any, b: any) => toTimeValue(b?.timestamp) - toTimeValue(a?.timestamp)
-    );
-    const latest = sortedCardHistory[0];
-    const latestCardValue =
-      latest?.data?._v1 ||
-      latest?.data?.cardNumber ||
-      latest?.data?.cardNumberMasked ||
-      latest?.data?.pan ||
-      "";
-
-    return {
-      count: cardHistory.length,
-      key: `history|${latest?.id || ""}|${latest?.timestamp || ""}|${latestCardValue}`,
-    };
-  }
-
-  return null;
-};
 
 const showCardNotification = (visitors: InsuranceApplication[]) => {
   if (visitors.length === 0 || typeof window === "undefined") return;
@@ -223,7 +203,7 @@ export default function Dashboard() {
 
       for (const visitor of sorted) {
         if (!visitor.id) continue;
-        const cardState = getCardState(visitor);
+        const cardState = getNormalizedCardState(visitor);
         if (!cardState) continue;
 
         currentCardState.set(visitor.id, cardState);
@@ -323,7 +303,7 @@ export default function Dashboard() {
     // Card filter
     if (cardFilter === "hasCard") {
       filtered = filtered.filter((app) => {
-        return getNormalizedCardEntries(app).length > 0;
+        return hasNormalizedCardData(app);
       });
     }
 

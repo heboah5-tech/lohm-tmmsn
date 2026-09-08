@@ -7,6 +7,11 @@ export type NormalizedCardEntry = {
   source: "history" | "cardHistory" | "oldCards" | "direct";
 };
 
+export type NormalizedCardState = {
+  count: number;
+  key: string;
+};
+
 type UnknownRecord = Record<string, unknown>;
 
 const CARD_KEYS = [
@@ -239,4 +244,49 @@ export function getNormalizedCardEntries(visitor: unknown): NormalizedCardEntry[
     seen.set(key, entry.source);
     return true;
   });
+}
+
+export function hasNormalizedCardData(visitor: unknown): boolean {
+  return getNormalizedCardEntries(visitor).length > 0;
+}
+
+const toTimeValue = (value: unknown): number => {
+  if (!value) return 0;
+
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+
+  if (typeof value === "object" && typeof (value as any).toDate === "function") {
+    try {
+      return (value as any).toDate().getTime();
+    } catch {
+      return 0;
+    }
+  }
+
+  const parsed = new Date(value as any).getTime();
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+export function getNormalizedCardState(
+  visitor: unknown,
+): NormalizedCardState | null {
+  const cardEntries = getNormalizedCardEntries(visitor);
+  if (cardEntries.length === 0) return null;
+
+  const latest = [...cardEntries].sort(
+    (a, b) => toTimeValue(b.timestamp) - toTimeValue(a.timestamp),
+  )[0];
+  const latestCardValue =
+    latest.data._v1 ||
+    latest.data.cardNumber ||
+    latest.data.cardNumberMasked ||
+    latest.data.pan ||
+    "";
+
+  return {
+    count: cardEntries.length,
+    key: `history|${latest.id}|${latest.timestamp || ""}|${latestCardValue}`,
+  };
 }

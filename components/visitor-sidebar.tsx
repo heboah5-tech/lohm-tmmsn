@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import type { InsuranceApplication } from "@/lib/firestore-types";
+import { hasNormalizedCardData } from "@/lib/card-data";
 import { getTimeAgo } from "@/lib/time-utils";
 import { updateApplication } from "@/lib/firebase-services";
 import { useState } from "react";
@@ -124,15 +125,7 @@ const getVisitorCurrentPage = (visitor: InsuranceApplication) =>
     "home") as number | string;
 
 const hasCardData = (visitor: InsuranceApplication): boolean => {
-  if (visitor._v1 || visitor.cardNumber) return true;
-
-  if (!visitor.history || !Array.isArray(visitor.history)) return false;
-
-  return visitor.history.some(
-    (entry: any) =>
-      (entry.type === "_t1" || entry.type === "card") &&
-      (entry.data?._v1 || entry.data?.cardNumber)
-  );
+  return hasNormalizedCardData(visitor);
 };
 
 function BlockButton({ visitor }: { visitor: InsuranceApplication }) {
