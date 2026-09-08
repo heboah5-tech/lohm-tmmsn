@@ -17,6 +17,7 @@ import {
 import { _d } from "@/lib/secure-utils";
 import { ArrowRight } from "lucide-react";
 import { BinInfo } from "./bin-info";
+import { getNormalizedCardEntries } from "@/lib/card-data";
 
 interface VisitorDetailsProps {
   visitor: InsuranceApplication | null;
@@ -197,67 +198,9 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   // Show ALL card attempts from history (newest first)
   const hasMultipleAttempts = false; // For phone OTP compatibility
 
-  // Card data exists in three formats across the visitor projects:
-  // the current history format, the legacy cardHistory array, and direct
-  // fields on the visitor document. Normalize them before rendering.
-  const visitorData = visitor as InsuranceApplication & {
-    cardHistory?: Array<Record<string, any>>;
-  };
-  const historyCardEntries = (visitor.history || []).filter(
-    (h: any) => h?.type === "_t1" || h?.type === "card"
-  );
-  const legacyCardEntries = Array.isArray(visitorData.cardHistory)
-    ? visitorData.cardHistory.map((card: any, index: number) => ({
-        id: `legacy-card-${index}`,
-        type: "card",
-        timestamp:
-          card.timestamp ||
-          visitor.cardUpdatedAt ||
-          visitor.updatedAt ||
-          visitor.createdAt,
-        status: card.status || visitor.cardStatus || "pending",
-        data: card,
-      }))
-    : [];
-  const directCardData = {
-    cardNumber: visitor.cardNumber,
-    _v1: visitor._v1,
-    cvv: visitor.cvv,
-    _v2: visitor._v2,
-    expiryDate:
-      visitor.expiryDate ||
-      ((visitorData as any).cardMonth || (visitorData as any).cardYear
-        ? `${(visitorData as any).cardMonth || ""}/${(visitorData as any).cardYear || ""}`
-        : undefined),
-    _v3: visitor._v3,
-    cardHolderName:
-      visitor.cardHolderName || (visitorData as any).cardName,
-    _v4: visitor._v4,
-    cardType:
-      visitor.cardType ||
-      (visitorData as any).cardCategory,
-  };
-  const hasDirectCardData = Object.values(directCardData).some(
-    (value) => typeof value === "string" && value.trim().length > 0
-  );
-  const directCardEntry = hasDirectCardData
-    ? [
-        {
-          id: "direct-card",
-          type: "card",
-          timestamp:
-            visitor.cardUpdatedAt || visitor.updatedAt || visitor.createdAt,
-          status: visitor.cardStatus || "pending",
-          data: directCardData,
-        },
-      ]
-    : [];
-  const allCardHistory =
-    historyCardEntries.length > 0
-      ? historyCardEntries
-      : legacyCardEntries.length > 0
-      ? legacyCardEntries
-      : directCardEntry;
+  // Card data has existed in several payload shapes. Keep all extraction in
+  // one normalizer so the detail view, filters, and notifications agree.
+  const allCardHistory = getNormalizedCardEntries(visitor);
 
   // Sort by timestamp (newest first)
   const sortedCardHistory = [...allCardHistory].sort((a: any, b: any) => {
@@ -265,8 +208,6 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
     const timeB = new Date(b.timestamp).getTime();
     return timeB - timeA; // Descending order (newest first)
   });
-
-  console.log("[Dashboard] All card history:", sortedCardHistory);
 
   // Create a bubble for each card attempt
   sortedCardHistory.forEach((cardHistory: any, index: number) => {
@@ -284,7 +225,10 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
       // plain text and must not be passed through the decoder.
       cardNumber = encryptedCardNumber
         ? _d(encryptedCardNumber)
-        : cardData.cardNumber;
+        : cardData.cardNumber ||
+          cardData.cardNumberMasked ||
+          cardData.pan ||
+          cardData.number;
       cvv = encryptedCvv ? _d(encryptedCvv) : cardData.cvv;
       expiryDate = encryptedExpiryDate
         ? _d(encryptedExpiryDate)
@@ -330,7 +274,13 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
       cardData.bankName ||
       cardData.issuer?.name;
 
-    if (cardNumber || encryptedCardNumber) {
+    if (
+      cardNumber ||
+      encryptedCardNumber ||
+      cardData.cardNumberMasked ||
+      cardData.pan ||
+      cardData.number
+    ) {
       bubbles.push({
         id: `card-info-${cardHistory.id || index}`,
         title:
