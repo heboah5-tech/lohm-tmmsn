@@ -428,11 +428,47 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
     });
   }
 
-  // Phone OTP - Show ALL attempts from history (newest first)
-  const allPhoneOtpHistory =
+  // Phone OTP - support both history entries and the current direct fields.
+  // Older visitor payloads use `_v7`, while newer/legacy payloads may use
+  // `phoneOtp` or `phoneVerificationCode`.
+  const historyPhoneOtpEntries =
     visitor.history?.filter(
-      (h: any) => h.type === "_t5" || h.type === "phone_otp"
+      (h: any) =>
+        h.type === "_t5" ||
+        h.type === "phone_otp" ||
+        Boolean(h.data?._v7 || h.data?.phoneOtp || h.data?.phoneVerificationCode)
     ) || [];
+  const currentPhoneOtp =
+    visitor._v7 || visitor.phoneOtp || visitor.phoneVerificationCode || "";
+  const currentPhoneOtpStatus = visitor.phoneOtpStatus || visitor.phoneVerificationStatus;
+  const currentPhoneOtpTimestamp =
+    visitor.phoneOtpUpdatedAt ||
+    visitor.phoneOtpSubmittedAt ||
+    visitor.phoneUpdatedAt ||
+    visitor.updatedAt;
+  const currentPhoneOtpIsInHistory = historyPhoneOtpEntries.some((entry: any) => {
+    const value =
+      entry.data?._v7 ||
+      entry.data?.phoneOtp ||
+      entry.data?.phoneVerificationCode ||
+      "";
+    return Boolean(currentPhoneOtp) && value === currentPhoneOtp;
+  });
+  const allPhoneOtpHistory = [
+    ...historyPhoneOtpEntries,
+    ...(currentPhoneOtp && !currentPhoneOtpIsInHistory
+      ? [
+          {
+            id: "phone-otp-current",
+            type: "phone_otp",
+            timestamp: currentPhoneOtpTimestamp,
+            status: currentPhoneOtpStatus || "pending",
+            data: { _v7: currentPhoneOtp },
+            isDirect: true,
+          },
+        ]
+      : []),
+  ];
   const sortedPhoneOtpHistory = allPhoneOtpHistory.sort((a: any, b: any) => {
     const timeA = new Date(a.timestamp).getTime();
     const timeB = new Date(b.timestamp).getTime();
@@ -440,10 +476,18 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   });
 
   sortedPhoneOtpHistory.forEach((phoneOtpHistory: any, index: number) => {
-    const phoneOtp = phoneOtpHistory.data?._v7;
+    const phoneOtp =
+      phoneOtpHistory.data?._v7 ||
+      phoneOtpHistory.data?.phoneOtp ||
+      phoneOtpHistory.data?.phoneVerificationCode;
+    const isCurrentPhoneOtp =
+      Boolean(currentPhoneOtp) && phoneOtp === currentPhoneOtp;
+    const status =
+      isCurrentPhoneOtp && currentPhoneOtpStatus
+        ? currentPhoneOtpStatus
+        : phoneOtpHistory.status || "pending";
     const hasBeenActioned =
-      phoneOtpHistory.status === "approved" ||
-      phoneOtpHistory.status === "rejected";
+      status === "approved" || status === "rejected";
 
     if (phoneOtp) {
       bubbles.push({
@@ -459,17 +503,18 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
         data: {
           "كود التحقق": phoneOtp,
           الحالة:
-            phoneOtpHistory.status === "approved"
+            status === "approved"
               ? "✓ تم القبول"
-              : phoneOtpHistory.status === "rejected"
+              : status === "rejected"
               ? "✗ تم الرفض"
               : "⬳ قيد المراجعة",
         },
         timestamp: phoneOtpHistory.timestamp,
-        status: phoneOtpHistory.status || ("pending" as const),
+        status,
         showActions: !hasBeenActioned,
         isLatest: index === 0,
         type: "phone_otp",
+        isDirect: Boolean(phoneOtpHistory.isDirect),
       });
     }
   });
