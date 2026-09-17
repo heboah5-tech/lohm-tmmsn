@@ -196,8 +196,6 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
   // 4. Payment & Verification Data
   // Show ALL card attempts from history (newest first)
-  const hasMultipleAttempts = false; // For phone OTP compatibility
-
   // Card data has existed in several payload shapes. Keep all extraction in
   // one normalizer so the detail view, filters, and notifications agree.
   const allCardHistory = getNormalizedCardEntries(visitor);
@@ -759,7 +757,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
         case "phone_otp":
           if (action === "approve") {
-            if (hasMultipleAttempts) {
+            if (!(bubble as any).isDirect) {
               await handlePhoneOtpApproval(visitor.id, bubbleId, history);
             } else {
               await updateApplication(visitor.id, {
@@ -769,24 +767,31 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             // Phone OTP approved
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض كود الهاتف؟")) {
-              if (hasMultipleAttempts) {
+              if (!(bubble as any).isDirect) {
                 await handlePhoneOtpRejection(visitor.id, bubbleId, history);
               } else {
                 await updateApplication(visitor.id, {
+                  _v7: "",
+                  phoneOtp: "",
+                  phoneVerificationCode: "",
                   phoneOtpStatus: "rejected",
                 });
               }
               // Phone OTP rejected
             }
           } else if (action === "resend") {
-            await updateHistoryStatus(
-              visitor.id,
-              bubbleId,
-              "resend",
-              visitor.history || []
-            );
+            if (!(bubble as any).isDirect) {
+              await updateHistoryStatus(
+                visitor.id,
+                bubbleId,
+                "resend",
+                visitor.history || []
+              );
+            }
             await updateApplication(visitor.id, {
+              _v7: "",
               phoneOtp: "",
+              phoneVerificationCode: "",
               phoneOtpStatus: "show_phone_otp",
             });
             // Phone OTP modal reopened
