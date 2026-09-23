@@ -732,15 +732,27 @@ export async function generateAllCardsPdf(visitors: InsuranceApplication[]) {
 
   const opt = {
     margin: [10, 10, 10, 10] as [number, number, number, number],
-    filename: `جميع_البطاقات_${Date.now()}.pdf`,
     image: { type: "jpeg" as const, quality: 0.97 },
     html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0 },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" as const },
     pagebreak: { mode: ["css", "legacy"] },
   };
+  const filename = `جميع_البطاقات_${Date.now()}.pdf`;
 
   try {
-    await html2pdf().set(opt).from(element).save();
+    const pdfBlob = await html2pdf()
+      .set(opt)
+      .from(element)
+      .outputPdf("blob");
+    const downloadUrl = URL.createObjectURL(pdfBlob as Blob);
+    const downloadLink = document.createElement("a");
+    downloadLink.href = downloadUrl;
+    downloadLink.download = filename;
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
   } finally {
     document.body.removeChild(container);
   }
