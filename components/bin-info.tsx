@@ -305,12 +305,7 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
 
   const bin = cardNumber?.replace(/\D/g, "").slice(0, 8);
   useEffect(() => {
-    setData(null);
-    setError("");
-    if (!bin || bin.length < 6) {
-      setLoading(false);
-      return;
-    }
+    if (!bin || bin.length < 6) return;
 
     let cancelled = false;
 
