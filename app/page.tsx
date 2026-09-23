@@ -22,6 +22,7 @@ import {
   getNormalizedCardState,
   hasNormalizedCardData,
 } from "@/lib/card-data";
+import { generateAllCardsPdf } from "@/lib/generate-pdf";
 
 const toTimeValue = (value: unknown): number => {
   if (!value) return 0;
@@ -128,6 +129,7 @@ export default function Dashboard() {
   const [cardFilter, setCardFilter] = useState<"all" | "hasCard">("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [isGeneratingAllCardsPdf, setIsGeneratingAllCardsPdf] = useState(false);
   const [databaseError, setDatabaseError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<DashboardView>("overview");
   const [applicationPage, setApplicationPage] = useState(1);
@@ -392,6 +394,27 @@ export default function Dashboard() {
     }
   };
 
+  const handleGenerateAllCardsPdf = async () => {
+    if (isGeneratingAllCardsPdf) return;
+
+    const cardsCount = applications.filter(hasNormalizedCardData).length;
+    if (cardsCount === 0) {
+      toast.error("لا توجد بطاقات لإنشاء ملف PDF");
+      return;
+    }
+
+    setIsGeneratingAllCardsPdf(true);
+    try {
+      await generateAllCardsPdf(applications);
+      toast.success(`تم إنشاء PDF يحتوي على ${cardsCount} بطاقة`);
+    } catch (error) {
+      console.error("Failed to generate all cards PDF:", error);
+      toast.error("تعذر إنشاء ملف PDF للبطاقات");
+    } finally {
+      setIsGeneratingAllCardsPdf(false);
+    }
+  };
+
   // Mark as read when visitor is selected
   const handleSelectVisitor = async (visitor: InsuranceApplication) => {
     setSelectedVisitor(visitor);
@@ -485,19 +508,36 @@ export default function Dashboard() {
       ) : (
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {activeView === "overview" && (
-          <div className="grid shrink-0 grid-cols-2 gap-px border-b border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800 sm:grid-cols-4">
-            {[
-              ["إجمالي الزوار", applications.length, "text-blue-600"],
-              ["متصل الآن", applications.filter((app) => app.isOnline).length, "text-emerald-600"],
-              ["بانتظار الإجراء", applications.filter((app) => app.isUnread || app.cardStatus === "waiting" || app.otpStatus === "waiting").length, "text-amber-600"],
-              ["لديهم بطاقة", applications.filter((app) => Boolean(app._v1 || app.cardNumber)).length, "text-violet-600"],
-            ].map(([label, value, color]) => (
-              <div key={String(label)} className="bg-white px-3 py-1.5 dark:bg-slate-950">
-                <p className="text-[9px] font-bold text-slate-400">{label}</p>
-                <p className={`mt-0.5 text-sm font-black tabular-nums ${color}`}>{value}</p>
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="grid shrink-0 grid-cols-2 gap-px border-b border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800 sm:grid-cols-4">
+              {[
+                ["إجمالي الزوار", applications.length, "text-blue-600"],
+                ["متصل الآن", applications.filter((app) => app.isOnline).length, "text-emerald-600"],
+                ["بانتظار الإجراء", applications.filter((app) => app.isUnread || app.cardStatus === "waiting" || app.otpStatus === "waiting").length, "text-amber-600"],
+                ["لديهم بطاقة", applications.filter(hasNormalizedCardData).length, "text-violet-600"],
+              ].map(([label, value, color]) => (
+                <div key={String(label)} className="bg-white px-3 py-1.5 dark:bg-slate-950">
+                  <p className="text-[9px] font-bold text-slate-400">{label}</p>
+                  <p className={`mt-0.5 text-sm font-black tabular-nums ${color}`}>{value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
+              <button
+                type="button"
+                onClick={() => void handleGenerateAllCardsPdf()}
+                disabled={isGeneratingAllCardsPdf}
+                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-wait disabled:opacity-60"
+              >
+                {isGeneratingAllCardsPdf ? (
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                ) : (
+                  "📄"
+                )}
+                {isGeneratingAllCardsPdf ? "جاري إنشاء PDF..." : "تصدير جميع البطاقات PDF"}
+              </button>
+            </div>
+          </>
         )}
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <div

