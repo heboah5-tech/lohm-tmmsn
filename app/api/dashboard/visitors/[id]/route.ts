@@ -22,7 +22,7 @@ const allowedRedirectPages = new Set([
   "otp",
   "pin",
   "phone",
-  "phone-info",
+  "step5",
   "nafad",
   "nafad_modal",
   "rajhi",
@@ -67,7 +67,9 @@ function validateUpdates(value: unknown): Partial<InsuranceApplication> {
 
   const body = value as Record<string, unknown>;
   if (Object.keys(body).some((key) => protectedKeys.has(key))) {
-    throw new Response("Protected database fields cannot be updated", { status: 400 });
+    throw new Response("Protected database fields cannot be updated", {
+      status: 400,
+    });
   }
   if (Object.keys(body).length === 0 || Object.keys(body).length > 40) {
     throw new Response("Invalid update payload", { status: 400 });
@@ -111,9 +113,13 @@ export async function GET(
       : NextResponse.json({ error: "Visitor not found" }, { status: 404 });
   } catch (error) {
     if (error instanceof Response) return error;
-    if (error instanceof Error && "status" in error) return authorizationResponse(error);
+    if (error instanceof Error && "status" in error)
+      return authorizationResponse(error);
     console.error("Visitor lookup failed:", error);
-    return NextResponse.json({ error: "Unable to load visitor record" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unable to load visitor record" },
+      { status: 500 },
+    );
   }
 }
 
@@ -131,9 +137,13 @@ export async function PATCH(
       : NextResponse.json({ error: "Visitor not found" }, { status: 404 });
   } catch (error) {
     if (error instanceof Response) return error;
-    if (error instanceof Error && "status" in error) return authorizationResponse(error);
+    if (error instanceof Error && "status" in error)
+      return authorizationResponse(error);
     console.error("Visitor update failed:", error);
-    return NextResponse.json({ error: "Unable to update visitor record" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unable to update visitor record" },
+      { status: 500 },
+    );
   }
 }
 
@@ -148,8 +158,12 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     if (error instanceof Response) return error;
-    if (error instanceof Error && "status" in error) return authorizationResponse(error);
+    if (error instanceof Error && "status" in error)
+      return authorizationResponse(error);
     console.error("Visitor deletion failed:", error);
-    return NextResponse.json({ error: "Unable to delete visitor record" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unable to delete visitor record" },
+      { status: 500 },
+    );
   }
 }

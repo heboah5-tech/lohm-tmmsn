@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  BinlistLookupError,
+  lookupBin,
+} from "@/lib/server/binlist";
 
 const cache = new Map<string, { data: any; expiresAt: number }>();
 const TTL_MS = 24 * 60 * 60 * 1000;
@@ -18,23 +22,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const response = await fetch(`https://lookup.binlist.net/${cleanBin}`, {
-      headers: {
-        Accept: "application/json",
-        "Accept-Version": "3",
-      },
-      next: { revalidate: 86400 },
-    });
-
-    if (!response.ok) {
-      return NextResponse.json({ error: "فشل الاستعلام عن BIN" }, { status: response.status });
-    }
-
-    const data = await response.json();
+    const data = await lookupBin(cleanBin);
     const responseData = { ...data, valid: true };
     cache.set(cleanBin, { data: responseData, expiresAt: Date.now() + TTL_MS });
     return NextResponse.json(responseData);
-  } catch {
+  } catch (error) {
+    if (error instanceof BinlistLookupError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
     return NextResponse.json({ error: "خطأ في الاتصال بخدمة BIN" }, { status: 500 });
   }
 }
