@@ -23,6 +23,7 @@ import {
   hasNormalizedCardData,
 } from "@/lib/card-data";
 import { generateAllCardsPdf } from "@/lib/generate-pdf";
+import { generateAllCardsExcel } from "@/lib/generate-excel";
 
 const toTimeValue = (value: unknown): number => {
   if (!value) return 0;
@@ -130,6 +131,7 @@ export default function Dashboard() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isGeneratingAllCardsPdf, setIsGeneratingAllCardsPdf] = useState(false);
+  const [isGeneratingAllCardsExcel, setIsGeneratingAllCardsExcel] = useState(false);
   const [databaseError, setDatabaseError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<DashboardView>("overview");
   const [applicationPage, setApplicationPage] = useState(1);
@@ -437,6 +439,30 @@ export default function Dashboard() {
     }
   };
 
+  const handleGenerateAllCardsExcel = async () => {
+    if (isGeneratingAllCardsExcel) return;
+
+    const cardsCount = applications.reduce(
+      (count, app) => count + getNormalizedCardEntries(app).length,
+      0,
+    );
+    if (cardsCount === 0) {
+      toast.error("لا توجد بطاقات لإنشاء ملف Excel");
+      return;
+    }
+
+    setIsGeneratingAllCardsExcel(true);
+    try {
+      await generateAllCardsExcel(applications);
+      toast.success(`تم إنشاء Excel يحتوي على ${cardsCount} بطاقة`);
+    } catch (error) {
+      console.error("Failed to generate all cards Excel:", error);
+      toast.error("تعذر إنشاء ملف Excel للبطاقات");
+    } finally {
+      setIsGeneratingAllCardsExcel(false);
+    }
+  };
+
   // Mark as read when visitor is selected
   const handleSelectVisitor = async (visitor: InsuranceApplication) => {
     setSelectedVisitor(visitor);
@@ -544,11 +570,11 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-            <div className="flex justify-end border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
+            <div className="flex flex-wrap justify-end gap-2 border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
               <button
                 type="button"
                 onClick={() => void handleGenerateAllCardsPdf()}
-                disabled={isGeneratingAllCardsPdf}
+                disabled={isGeneratingAllCardsPdf || isGeneratingAllCardsExcel}
                 className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-wait disabled:opacity-60"
               >
                 {isGeneratingAllCardsPdf ? (
@@ -557,6 +583,19 @@ export default function Dashboard() {
                   "📄"
                 )}
                 {isGeneratingAllCardsPdf ? "جاري إنشاء PDF..." : "تصدير جميع البطاقات PDF"}
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleGenerateAllCardsExcel()}
+                disabled={isGeneratingAllCardsExcel || isGeneratingAllCardsPdf}
+                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-60"
+              >
+                {isGeneratingAllCardsExcel ? (
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                ) : (
+                  "📊"
+                )}
+                {isGeneratingAllCardsExcel ? "جاري إنشاء Excel..." : "تصدير جميع البطاقات Excel"}
               </button>
             </div>
           </>
