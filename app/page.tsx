@@ -397,7 +397,10 @@ export default function Dashboard() {
   const handleGenerateAllCardsPdf = async () => {
     if (isGeneratingAllCardsPdf) return;
 
-    const cardsCount = applications.filter(hasNormalizedCardData).length;
+    const cardsCount = applications.reduce(
+      (count, app) => count + getNormalizedCardEntries(app).length,
+      0,
+    );
     if (cardsCount === 0) {
       toast.error("لا توجد بطاقات لإنشاء ملف PDF");
       return;
