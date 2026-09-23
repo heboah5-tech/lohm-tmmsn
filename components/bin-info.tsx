@@ -242,7 +242,8 @@ const clientCache = new Map<string, BinData | "error">();
 const inFlight = new Map<string, Promise<BinData | "error">>();
 
 async function fetchBin(bin: string): Promise<BinData | "error"> {
-  if (clientCache.has(bin)) return clientCache.get(bin)!;
+  const cached = clientCache.get(bin);
+  if (cached && cached !== "error") return cached;
   if (inFlight.has(bin)) return inFlight.get(bin)!;
 
   const promise = fetch(`/api/bin?bin=${bin}`)
@@ -256,7 +257,13 @@ async function fetchBin(bin: string): Promise<BinData | "error"> {
 
   inFlight.set(bin, promise);
   const result = await promise;
-  clientCache.set(bin, result);
+  // Do not cache transient provider/network failures. A later render or
+  // retry should be able to recover without requiring a full page reload.
+  if (result !== "error") {
+    clientCache.set(bin, result);
+  } else {
+    clientCache.delete(bin);
+  }
   return result;
 }
 
@@ -298,17 +305,22 @@ export function BinInfo({ cardNumber }: BinInfoProps) {
 
   const bin = cardNumber?.replace(/\D/g, "").slice(0, 8);
   useEffect(() => {
-    if (!bin || bin.length < 6) return;
+    setData(null);
+    setError("");
+    if (!bin || bin.length < 6) {
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
 
     const run = async () => {
       const cached = clientCache.get(bin);
 
-      if (cached) {
+      if (cached && cached !== "error") {
         if (!cancelled) {
-          setError(cached === "error" ? "تعذّر التحقق من BIN" : "");
-          if (cached !== "error") setData(cached);
+          setData(cached);
+          setLoading(false);
         }
         return;
       }

@@ -19,17 +19,36 @@ export class BinlistLookupError extends Error {
  */
 export async function lookupBin(bin: string): Promise<BinlistResponse> {
   const cleanBin = bin.replace(/\D/g, "").slice(0, 8);
-  const response = await fetch(`https://lookup.binlist.net/${cleanBin}`, {
-    headers: {
-      Accept: "application/json",
-      "Accept-Version": "3",
-    },
-    next: { revalidate: 86400 },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+
+  let response: Response;
+  try {
+    response = await fetch(`https://lookup.binlist.net/${cleanBin}`, {
+      headers: {
+        Accept: "application/json",
+        "Accept-Version": "3",
+      },
+      signal: controller.signal,
+      next: { revalidate: 86400 },
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new BinlistLookupError("انتهت مهلة الاستعلام عن BIN", 504);
+    }
+    throw new BinlistLookupError("تعذر الاتصال بخدمة BIN", 502);
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     throw new BinlistLookupError("فشل الاستعلام عن BIN", response.status);
   }
 
-  return (await response.json()) as BinlistResponse;
+  const data = (await response.json()) as unknown;
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new BinlistLookupError("استجابة BIN غير صالحة", 502);
+  }
+
+  return data as BinlistResponse;
 }
