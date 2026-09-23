@@ -343,11 +343,30 @@ export default function Dashboard() {
     1,
     Math.ceil(filteredApplications.length / applicationPageSize),
   );
-  const safeApplicationPage = Math.min(applicationPage, totalApplicationPages);
+  const safeApplicationPage = Math.min(
+    Math.max(applicationPage, 1),
+    totalApplicationPages,
+  );
   const paginatedApplications = useMemo(() => {
     const start = (safeApplicationPage - 1) * applicationPageSize;
     return filteredApplications.slice(start, start + applicationPageSize);
   }, [safeApplicationPage, filteredApplications]);
+
+  useEffect(() => {
+    setApplicationPage((currentPage) =>
+      Math.min(Math.max(currentPage, 1), totalApplicationPages),
+    );
+  }, [totalApplicationPages]);
+
+  useEffect(() => {
+    setApplicationPage(1);
+  }, [cardFilter, searchQuery]);
+
+  const handleApplicationPageChange = (nextPage: number) => {
+    setApplicationPage(
+      Math.min(Math.max(nextPage, 1), totalApplicationPages),
+    );
+  };
 
   // Handle select all
   const handleSelectAll = () => {
@@ -586,7 +605,7 @@ export default function Dashboard() {
                  page: safeApplicationPage,
                  totalPages: totalApplicationPages,
                  totalItems: filteredApplications.length,
-                 onPageChange: setApplicationPage,
+                  onPageChange: handleApplicationPageChange,
                }}
             />
           </div>

@@ -401,7 +401,11 @@ export function VisitorSidebar({
             <button
               type="button"
               disabled={pagination.page <= 1}
-              onClick={() => pagination.onPageChange(pagination.page - 1)}
+              onClick={(event) => {
+                event.stopPropagation();
+                pagination.onPageChange(pagination.page - 1);
+              }}
+              aria-label="الصفحة السابقة"
               className="rounded-lg border border-gray-200 px-2 py-1 font-bold text-gray-600 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300"
             >
               السابق
@@ -409,7 +413,11 @@ export function VisitorSidebar({
             <button
               type="button"
               disabled={pagination.page >= pagination.totalPages}
-              onClick={() => pagination.onPageChange(pagination.page + 1)}
+              onClick={(event) => {
+                event.stopPropagation();
+                pagination.onPageChange(pagination.page + 1);
+              }}
+              aria-label="الصفحة التالية"
               className="rounded-lg border border-gray-200 px-2 py-1 font-bold text-gray-600 disabled:opacity-40 dark:border-slate-700 dark:text-slate-300"
             >
               التالي
