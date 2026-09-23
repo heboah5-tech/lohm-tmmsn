@@ -38,10 +38,41 @@ export const getApplication = async (id: string) => {
 };
 
 export const getAllApplications = async () => {
-  const result = await request<{ data: InsuranceApplication[] }>(
-    "/api/dashboard/visitors?page=1&pageSize=200",
+  const pageSize = 200;
+  const firstPage = await request<{
+    data: InsuranceApplication[];
+    total?: number;
+    pageSize?: number;
+  }>(
+    `/api/dashboard/visitors?page=1&pageSize=${pageSize}`,
   );
-  return result.data;
+
+  const total = firstPage.total ?? firstPage.data.length;
+  const responsePageSize = firstPage.pageSize || pageSize;
+  const totalPages = Math.max(1, Math.ceil(total / responsePageSize));
+  if (totalPages === 1) return firstPage.data;
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: totalPages - 1 }, (_, index) =>
+      request<{ data: InsuranceApplication[] }>(
+        `/api/dashboard/visitors?page=${index + 2}&pageSize=${responsePageSize}`,
+      ),
+    ),
+  );
+
+  const allApplications = [
+    firstPage.data,
+    ...remainingPages.map((page) => page.data),
+  ].flat();
+
+  return Array.from(
+    new Map(
+      allApplications.map((application, index) => [
+        application.id || `visitor-${index}`,
+        application,
+      ]),
+    ).values(),
+  );
 };
 
 export const getApplicationsByStatus = async (
