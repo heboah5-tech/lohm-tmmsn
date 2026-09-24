@@ -5,8 +5,8 @@ import { ZoomFontControls } from "@/components/zoom-font-controls";
 import { ClientProviders } from "@/components/client-providers";
 
 export const metadata: Metadata = {
-  title: "لوحة التحكم - BCare",
-  description: "لوحة تحكم إدارة زوار BCare",
+  title: "لوحة التحكم - Tamini",
+  description: "لوحة تحكم إدارة زوار Tamini",
 };
 
 export default function RootLayout({
