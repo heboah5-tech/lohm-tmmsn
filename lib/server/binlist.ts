@@ -1,5 +1,7 @@
 export type BinlistResponse = Record<string, unknown>;
 
+const LOOKUP_TIMEOUT_MS = 8_000;
+
 export class BinlistLookupError extends Error {
   constructor(
     message: string,
@@ -10,45 +12,150 @@ export class BinlistLookupError extends Error {
   }
 }
 
-/**
- * Promise-based Binlist lookup.
- *
- * This is the safe equivalent of `binlookup()(bin)` for the server route.
- * Keeping the request server-side avoids exposing provider behavior to the
- * browser and lets the dashboard retain its existing cache.
- */
-export async function lookupBin(bin: string): Promise<BinlistResponse> {
-  const cleanBin = bin.replace(/\D/g, "").slice(0, 8);
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
+function asRecord(value: unknown): BinlistResponse | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return value as BinlistResponse;
+}
 
-  let response: Response;
+function hasUsefulBinData(data: BinlistResponse): boolean {
+  const bank = asRecord(data.bank);
+  const country = asRecord(data.country);
+
+  return Boolean(
+    data.scheme ||
+      data.brand ||
+      data.type ||
+      bank?.name ||
+      country?.name,
+  );
+}
+
+async function requestProvider(
+  url: string,
+  headers: Record<string, string> = {},
+): Promise<BinlistResponse> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS);
+
   try {
-    response = await fetch(`https://lookup.binlist.net/${cleanBin}`, {
+    const response = await fetch(url, {
       headers: {
         Accept: "application/json",
-        "Accept-Version": "3",
+        ...headers,
       },
       signal: controller.signal,
       next: { revalidate: 86400 },
     });
+
+    if (!response.ok) {
+      throw new BinlistLookupError("فشل الاستعلام عن BIN", response.status);
+    }
+
+    let data: unknown;
+    try {
+      data = await response.json();
+    } catch {
+      throw new BinlistLookupError("استجابة BIN غير صالحة", 502);
+    }
+
+    const record = asRecord(data);
+    if (!record) {
+      throw new BinlistLookupError("استجابة BIN غير صالحة", 502);
+    }
+
+    return record;
   } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
+    if (error instanceof BinlistLookupError) throw error;
+    if (error instanceof Error && error.name === "AbortError") {
       throw new BinlistLookupError("انتهت مهلة الاستعلام عن BIN", 504);
     }
     throw new BinlistLookupError("تعذر الاتصال بخدمة BIN", 502);
   } finally {
     clearTimeout(timeout);
   }
+}
 
-  if (!response.ok) {
-    throw new BinlistLookupError("فشل الاستعلام عن BIN", response.status);
+async function lookupPrimary(bin: string): Promise<BinlistResponse> {
+  const data = await requestProvider(
+    `https://lookup.binlist.net/${bin}`,
+    { "Accept-Version": "3" },
+  );
+
+  if (data.success === false || !hasUsefulBinData(data)) {
+    throw new BinlistLookupError("لم تُرجع خدمة BIN بيانات صالحة", 502);
   }
 
-  const data = (await response.json()) as unknown;
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
+  return data;
+}
+
+async function lookupFallback(bin: string): Promise<BinlistResponse> {
+  const data = await requestProvider(
+    `https://binlist.io/lookup/${bin}/`,
+    { "User-Agent": "BeCareDashboard/1.0 (BIN metadata lookup)" },
+  );
+
+  if (data.success === false) {
+    throw new BinlistLookupError("لم يُعثر على BIN في الخدمة الاحتياطية", 404);
+  }
+
+  const sourceBank = asRecord(data.bank);
+  const sourceCountry = asRecord(data.country);
+  const normalized: BinlistResponse = {
+    number: data.number,
+    scheme: data.scheme,
+    brand: data.category,
+    type: data.type,
+    bank: sourceBank
+      ? {
+          name: sourceBank.name,
+          website: sourceBank.url,
+          url: sourceBank.url,
+          phone: sourceBank.phone,
+          city: sourceBank.city,
+        }
+      : undefined,
+    country: sourceCountry
+      ? {
+          name: sourceCountry.name,
+          alpha2: sourceCountry.alpha2,
+          currency: sourceCountry.currency,
+          emoji: sourceCountry.emoji,
+        }
+      : undefined,
+  };
+
+  if (!hasUsefulBinData(normalized)) {
     throw new BinlistLookupError("استجابة BIN غير صالحة", 502);
   }
 
-  return data as BinlistResponse;
+  return normalized;
+}
+
+/**
+ * Promise-based Binlist lookup.
+ *
+ * Try Binlist first, then fall back to Binlist.io if the primary provider
+ * errors, times out, or returns no usable card metadata.
+ */
+export async function lookupBin(bin: string): Promise<BinlistResponse> {
+  const cleanBin = bin.replace(/\D/g, "").slice(0, 8);
+
+  try {
+    return await lookupPrimary(cleanBin);
+  } catch (error) {
+    try {
+      return await lookupFallback(cleanBin);
+    } catch {
+      if (error instanceof BinlistLookupError) {
+        throw new BinlistLookupError(
+          "تعذر الحصول على معلومات BIN من الخدمتين",
+          error.status,
+        );
+      }
+      throw new BinlistLookupError(
+        "تعذر الحصول على معلومات BIN من الخدمتين",
+        502,
+      );
+    }
+  }
 }
