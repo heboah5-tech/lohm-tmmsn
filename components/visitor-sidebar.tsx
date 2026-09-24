@@ -26,6 +26,8 @@ interface VisitorSidebarProps {
   cardFilter: "all" | "hasCard";
   onCardFilterChange: (filter: "all" | "hasCard") => void;
   selectedIds: Set<string>;
+  allSelected: boolean;
+  isDeleting: boolean;
   onToggleSelect: (id: string) => void;
   onSelectAll: () => void;
   onDeleteSelected: () => void;
@@ -172,6 +174,8 @@ export function VisitorSidebar({
   cardFilter,
   onCardFilterChange,
   selectedIds,
+  allSelected,
+  isDeleting,
   onToggleSelect,
   onSelectAll,
   onDeleteSelected,
@@ -180,8 +184,6 @@ export function VisitorSidebar({
   pagination,
 }: VisitorSidebarProps) {
   void _onSidebarWidthChange;
-  const allSelected =
-    visitors.length > 0 && selectedIds.size === visitors.length;
   const isLandscape =
     typeof window !== "undefined" &&
     window.matchMedia("(orientation: landscape) and (max-width: 1024px)")
@@ -246,10 +248,11 @@ export function VisitorSidebar({
           {selectedIds.size > 0 && (
             <button
               onClick={onDeleteSelected}
-               className="flex min-w-[110px] flex-1 items-center justify-center gap-1.5 rounded-md bg-red-500 px-2 py-1.5 text-[11px] font-semibold text-white transition-all hover:bg-red-600 landscape:py-1 landscape:text-[10px]"
+              disabled={isDeleting}
+              className="flex min-w-[110px] flex-1 items-center justify-center gap-1.5 rounded-md bg-red-500 px-2 py-1.5 text-[11px] font-semibold text-white transition-all hover:bg-red-600 disabled:cursor-wait disabled:opacity-60 landscape:py-1 landscape:text-[10px]"
             >
               <Trash2 className="w-4 h-4 landscape:w-3 landscape:h-3" />
-              حذف ({selectedIds.size})
+              {isDeleting ? "جاري الحذف..." : `حذف (${selectedIds.size})`}
             </button>
           )}
         </div>

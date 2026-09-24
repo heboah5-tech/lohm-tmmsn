@@ -162,8 +162,14 @@ export const deleteApplication = async (id: string) => {
 
 export const deleteMultipleApplications = async (ids: string[]) => {
   if (ids.length === 0) return;
-  await request("/api/dashboard/visitors", {
-    method: "DELETE",
-    body: JSON.stringify({ ids }),
-  });
+
+  const uniqueIds = Array.from(new Set(ids));
+  const batchSize = 100;
+
+  for (let start = 0; start < uniqueIds.length; start += batchSize) {
+    await request("/api/dashboard/visitors", {
+      method: "DELETE",
+      body: JSON.stringify({ ids: uniqueIds.slice(start, start + batchSize) }),
+    });
+  }
 };

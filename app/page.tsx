@@ -129,6 +129,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [cardFilter, setCardFilter] = useState<"all" | "hasCard">("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeletingVisitors, setIsDeletingVisitors] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isGeneratingAllCardsPdf, setIsGeneratingAllCardsPdf] = useState(false);
   const [isGeneratingAllCardsExcel, setIsGeneratingAllCardsExcel] =
@@ -258,7 +259,7 @@ export default function Dashboard() {
             if (prev && prev.id) {
               selectedVisitorIdRef.current = prev.id;
               const updatedVisitor = sorted.find((app) => app.id === prev.id);
-              return updatedVisitor || prev;
+              return updatedVisitor || null;
             }
 
             // Auto-select first visitor only if none selected
@@ -380,24 +381,25 @@ export default function Dashboard() {
     setApplicationPage(Math.min(Math.max(nextPage, 1), totalApplicationPages));
   };
 
+  const filteredApplicationIds = filteredApplications
+    .map((app) => app.id)
+    .filter((id): id is string => id !== undefined);
+  const allFilteredApplicationsSelected =
+    filteredApplicationIds.length > 0 &&
+    filteredApplicationIds.every((id) => selectedIds.has(id));
+
   // Handle select all
   const handleSelectAll = () => {
-    if (selectedIds.size === filteredApplications.length) {
+    if (allFilteredApplicationsSelected) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(
-        new Set(
-          filteredApplications
-            .map((app) => app.id)
-            .filter((id): id is string => id !== undefined),
-        ),
-      );
+      setSelectedIds(new Set(filteredApplicationIds));
     }
   };
 
   // Handle delete selected
   const handleDeleteSelected = async () => {
-    if (selectedIds.size === 0) return;
+    if (selectedIds.size === 0 || isDeletingVisitors) return;
 
     const count = selectedIds.size;
     if (
@@ -408,12 +410,22 @@ export default function Dashboard() {
       return;
     }
 
+    setIsDeletingVisitors(true);
     try {
-      console.log("Deleting visitors:", Array.from(selectedIds));
       const idsToDelete = Array.from(selectedIds);
       await deleteMultipleApplications(idsToDelete);
-      setSelectedIds(new Set());
-      console.log("Delete successful");
+      const deletedIds = new Set(idsToDelete);
+      setApplications((current) =>
+        current.filter((application) => !application.id || !deletedIds.has(application.id)),
+      );
+      setSelectedVisitor((current) =>
+        current?.id && deletedIds.has(current.id) ? null : current,
+      );
+      setSelectedIds((current) => {
+        const remaining = new Set(current);
+        idsToDelete.forEach((id) => remaining.delete(id));
+        return remaining;
+      });
       alert(`✅ تم حذف ${count} زائر بنجاح`);
     } catch (error) {
       console.error("Error deleting applications:", error);
@@ -422,6 +434,8 @@ export default function Dashboard() {
           error instanceof Error ? error.message : "خطأ غير معروف"
         }`,
       );
+    } finally {
+      setIsDeletingVisitors(false);
     }
   };
 
@@ -675,6 +689,8 @@ export default function Dashboard() {
                   cardFilter={cardFilter}
                   onCardFilterChange={setCardFilter}
                   selectedIds={selectedIds}
+                  allSelected={allFilteredApplicationsSelected}
+                  isDeleting={isDeletingVisitors}
                   onToggleSelect={(id) => {
                     const newSet = new Set(selectedIds);
                     if (newSet.has(id)) {
